@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.example.lywsd02bledashboard.model.LogEntry
 import com.example.lywsd02bledashboard.model.LogType
 import com.example.lywsd02bledashboard.theme.BorderLine
+import com.example.lywsd02bledashboard.theme.BorderLineStrong
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusAmber
@@ -78,7 +81,12 @@ fun LogConsoleCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
@@ -93,33 +101,54 @@ fun LogConsoleCard(
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "작업 및 이벤트 로그",
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = InkPrimary
+                            color = InkPrimary,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
                             text = "BLE 통신 상태 및 데이터 수신 내역",
                             fontSize = 11.sp,
-                            color = InkMuted
+                            color = InkMuted,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                 }
 
+                // 지우기 버튼 (선명한 고대비 색상 및 최소 너비 확보)
                 OutlinedButton(
                     onClick = onClearLogs,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, BorderLineStrong),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = InkPrimary
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .height(36.dp)
+                        .defaultMinSize(minWidth = 75.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteSweep,
                         contentDescription = "로그 지우기",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(14.dp),
+                        tint = InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "지우기", fontSize = 12.sp)
+                    Text(
+                        text = "지우기",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = InkPrimary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
                 }
             }
 

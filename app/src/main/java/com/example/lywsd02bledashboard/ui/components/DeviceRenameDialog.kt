@@ -57,7 +57,21 @@ fun DeviceRenameDialog(
                 OutlinedTextField(
                     value = aliasText,
                     onValueChange = { aliasText = it },
-                    label = { Text("기기 별칭") },
+                    label = { 
+                        Text(
+                            text = "기기 별칭",
+                            color = InkPrimary,
+                            fontWeight = FontWeight.Bold
+                        ) 
+                    },
+                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = InkPrimary,
+                        unfocusedTextColor = InkPrimary,
+                        focusedLabelColor = TealPrimary,
+                        unfocusedLabelColor = InkPrimary,
+                        focusedBorderColor = TealPrimary,
+                        unfocusedBorderColor = com.example.lywsd02bledashboard.theme.BorderLineStrong
+                    ),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -73,12 +87,12 @@ fun DeviceRenameDialog(
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(text = "저장")
+                Text(text = "저장", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "취소", color = InkMuted)
+                Text(text = "취소", color = InkPrimary, fontWeight = FontWeight.Bold)
             }
         }
     )

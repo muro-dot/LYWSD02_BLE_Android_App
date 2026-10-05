@@ -43,6 +43,7 @@ import com.example.lywsd02bledashboard.theme.CyanAccent
 import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
+import com.example.lywsd02bledashboard.theme.InkSecondary
 import com.example.lywsd02bledashboard.theme.StatusAmber
 import com.example.lywsd02bledashboard.theme.StatusGreen
 import com.example.lywsd02bledashboard.theme.StatusRed
@@ -195,8 +196,8 @@ fun SensorMetricsGrid(
                             Text(
                                 text = "배터리 잔량",
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = InkMuted
+                                fontWeight = FontWeight.SemiBold,
+                                color = InkSecondary
                             )
                             Text(
                                 text = batHint,
@@ -234,7 +235,7 @@ fun SensorMetricsGrid(
                     Text(
                         text = "마지막 갱신: $lastBatteryTime",
                         fontSize = 11.sp,
-                        color = InkMuted,
+                        color = InkSecondary,
                         modifier = Modifier.align(Alignment.End)
                     )
                 }
@@ -269,8 +270,8 @@ private fun MetricCard(
                 Text(
                     text = title,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = InkMuted
+                    fontWeight = FontWeight.SemiBold,
+                    color = InkSecondary
                 )
                 Box(
                     modifier = Modifier

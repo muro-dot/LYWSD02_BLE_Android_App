@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.sp
 import com.example.lywsd02bledashboard.ble.BleProtocolParser
 import com.example.lywsd02bledashboard.model.BleConstants
 import com.example.lywsd02bledashboard.model.ClockDisplayMode
+import com.example.lywsd02bledashboard.theme.BorderLine
+import com.example.lywsd02bledashboard.theme.BorderLineStrong
 import com.example.lywsd02bledashboard.theme.CyanAccent
 import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
@@ -213,11 +215,34 @@ fun ClockSettingsCard(
                 onExpandedChange = { if (isConnected) expandedTimezone = !expandedTimezone },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
+                androidx.compose.material3.OutlinedTextField(
                     value = "${BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes)} (${getTimezoneDescription(deviceTimezoneMinutes)})",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("목표 타임존 (Timezone)") },
+                    label = { 
+                        Text(
+                            text = "목표 타임존 (Timezone)", 
+                            color = InkPrimary, 
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        ) 
+                    },
+                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = InkPrimary,
+                        unfocusedTextColor = InkPrimary,
+                        disabledTextColor = InkPrimary,
+                        focusedLabelColor = TealPrimary,
+                        unfocusedLabelColor = InkPrimary,
+                        disabledLabelColor = InkPrimary,
+                        focusedBorderColor = TealPrimary,
+                        unfocusedBorderColor = BorderLineStrong,
+                        disabledBorderColor = BorderLine
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        color = InkPrimary,
+                        fontSize = 14.sp
+                    ),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTimezone) },
                     modifier = Modifier
                         .menuAnchor()
@@ -232,7 +257,11 @@ fun ClockSettingsCard(
                     BleConstants.TIMEZONE_OFFSETS.forEach { offset ->
                         DropdownMenuItem(
                             text = {
-                                Text(text = "${BleProtocolParser.formatTimezoneOffset(offset)} (${getTimezoneDescription(offset)})")
+                                Text(
+                                    text = "${BleProtocolParser.formatTimezoneOffset(offset)} (${getTimezoneDescription(offset)})",
+                                    color = InkPrimary,
+                                    fontWeight = FontWeight.Medium
+                                )
                             },
                             onClick = {
                                 onTimezoneChange(offset)

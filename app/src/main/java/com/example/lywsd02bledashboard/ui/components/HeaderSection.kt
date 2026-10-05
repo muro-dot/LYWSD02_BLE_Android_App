@@ -125,7 +125,13 @@ fun HeaderSection(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "연결 해제", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "연결 해제", 
+                                fontSize = 13.sp, 
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
+                            )
                         }
                     }
                     ConnectionState.CONNECTING -> {
@@ -144,7 +150,13 @@ fun HeaderSection(
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "연결 취소", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "연결 취소", 
+                                fontSize = 13.sp, 
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
+                            )
                         }
                     }
                     ConnectionState.SCANNING -> {
@@ -163,7 +175,13 @@ fun HeaderSection(
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "검색 중...", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "검색 중...", 
+                                fontSize = 13.sp, 
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
+                            )
                         }
                     }
                     ConnectionState.DISCONNECTED -> {
@@ -182,7 +200,13 @@ fun HeaderSection(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "기기 검색", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "기기 검색", 
+                                fontSize = 13.sp, 
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
+                            )
                         }
                     }
                 }

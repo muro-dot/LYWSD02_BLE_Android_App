@@ -137,9 +137,20 @@ fun DisplaySettingsCard(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "저장 중...", fontSize = 12.sp)
+                        Text(
+                            text = "저장 중...", 
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            softWrap = false
+                        )
                     } else {
-                        Text(text = "단위 저장", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "단위 저장", 
+                            fontSize = 12.sp, 
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            softWrap = false
+                        )
                     }
                 }
             }

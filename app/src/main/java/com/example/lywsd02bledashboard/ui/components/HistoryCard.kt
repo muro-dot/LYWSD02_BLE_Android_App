@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import com.example.lywsd02bledashboard.model.HistoryRecord
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import com.example.lywsd02bledashboard.theme.BorderLine
+import com.example.lywsd02bledashboard.theme.BorderLineStrong
 import com.example.lywsd02bledashboard.theme.CyanAccent
 import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
@@ -85,13 +87,18 @@ fun HistoryCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // 헤더
+            // 헤더 (좌측 타이틀 + 우측 CSV 내보내기 버튼)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
@@ -106,35 +113,59 @@ fun HistoryCard(
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "과거 온습도 기록",
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = InkPrimary
+                            color = InkPrimary,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "센서 내장 메모리의 시간별 통계 데이터",
+                            text = "센서 내장 메모리 통계",
                             fontSize = 11.sp,
-                            color = InkMuted
+                            color = InkMuted,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                // CSV 내보내기 버튼
+                // CSV 내보내기 버튼 (세로 줄바꿈 완벽 방지 및 고대비 색상 적용)
                 OutlinedButton(
                     onClick = onExportCsv,
                     enabled = historyRecords.isNotEmpty(),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp, 
+                        if (historyRecords.isNotEmpty()) TealPrimary else BorderLineStrong
+                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = TealPrimary,
+                        disabledContentColor = InkPrimary
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .height(36.dp)
+                        .defaultMinSize(minWidth = 105.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "CSV 내보내기",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(13.dp),
+                        tint = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "CSV 내보내기", fontSize = 12.sp)
+                    Text(
+                        text = "CSV 내보내기",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
                 }
             }
 
@@ -144,7 +175,7 @@ fun HistoryCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 var expandedLimit by remember { mutableStateOf(false) }
                 val limits = listOf(24, 48, 96)
@@ -154,11 +185,34 @@ fun HistoryCard(
                     onExpandedChange = { if (isConnected && !isLoading) expandedLimit = !expandedLimit },
                     modifier = Modifier.weight(1f)
                 ) {
-                    OutlinedTextField(
+                    androidx.compose.material3.OutlinedTextField(
                         value = "최근 $historyLimit 개",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("조회 개수") },
+                        label = { 
+                            Text(
+                                text = "조회 개수", 
+                                color = InkPrimary, 
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            ) 
+                        },
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = InkPrimary,
+                            unfocusedTextColor = InkPrimary,
+                            disabledTextColor = InkPrimary,
+                            focusedLabelColor = TealPrimary,
+                            unfocusedLabelColor = InkPrimary,
+                            disabledLabelColor = InkPrimary,
+                            focusedBorderColor = TealPrimary,
+                            unfocusedBorderColor = BorderLineStrong,
+                            disabledBorderColor = BorderLine
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            color = InkPrimary,
+                            fontSize = 14.sp
+                        ),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLimit) },
                         modifier = Modifier
                             .menuAnchor()
@@ -172,7 +226,13 @@ fun HistoryCard(
                     ) {
                         limits.forEach { lim ->
                             DropdownMenuItem(
-                                text = { Text(text = "최근 $lim 개") },
+                                text = { 
+                                    Text(
+                                        text = "최근 $lim 개",
+                                        color = InkPrimary,
+                                        fontWeight = FontWeight.Medium
+                                    ) 
+                                },
                                 onClick = {
                                     onLimitChange(lim)
                                     expandedLimit = false
@@ -189,25 +249,39 @@ fun HistoryCard(
                         containerColor = TealPrimary,
                         contentColor = Color.White
                     ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f).height(56.dp)
+                    modifier = Modifier
+                        .weight(1.15f)
+                        .height(56.dp)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(16.dp),
                             color = Color.White,
                             strokeWidth = 2.dp
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "수집 중...", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "수집 중...", 
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            softWrap = false
+                        )
                     } else {
                         Icon(
                             imageVector = Icons.Default.Download,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "기록 불러오기", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "기록 불러오기", 
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            softWrap = false
+                        )
                     }
                 }
             }

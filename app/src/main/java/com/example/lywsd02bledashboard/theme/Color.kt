@@ -18,9 +18,9 @@ val BackgroundPaper = Color(0xFFF3F5F1)
 val SurfaceWhite = Color(0xFFFFFFFF)
 val SurfaceSoft = Color(0xFFEDF2EF)
 
-val InkPrimary = Color(0xFF142A30)
-val InkSecondary = Color(0xFF30464B)
-val InkMuted = Color(0xFF69787B)
+val InkPrimary = Color(0xFF0F172A) // 매우 짙은 잉크색 (최대 시인성)
+val InkSecondary = Color(0xFF1E293B) // 짙은 서브 텍스트
+val InkMuted = Color(0xFF334155) // 흐릿하지 않은 명확한 다크 슬레이트 그레이
 
-val BorderLine = Color(0xFFD9DFDC)
-val BorderLineStrong = Color(0xFFBDC9C5)
+val BorderLine = Color(0xFFCBD5E1) // 선명한 테두리선
+val BorderLineStrong = Color(0xFF94A3B8)

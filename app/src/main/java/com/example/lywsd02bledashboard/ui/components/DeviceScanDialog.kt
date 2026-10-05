@@ -183,7 +183,7 @@ fun DeviceScanDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "닫기", color = InkMuted)
+                Text(text = "닫기", color = InkPrimary, fontWeight = FontWeight.Bold)
             }
         }
     )
