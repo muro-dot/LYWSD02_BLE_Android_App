@@ -1,6 +1,5 @@
 package com.example.lywsd02bledashboard.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,20 +10,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.BluetoothConnected
-import androidx.compose.material.icons.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,17 +34,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lywsd02bledashboard.model.ConnectionState
-import com.example.lywsd02bledashboard.theme.CyanAccent
-import com.example.lywsd02bledashboard.theme.DeepTeal
+import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusAmber
-import com.example.lywsd02bledashboard.theme.StatusGreen
 import com.example.lywsd02bledashboard.theme.StatusRed
+import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 
 /**
- * 대시보드 상단 헤더: 앱 타이틀, 연결 상태 배지, 기기 검색 / 연결 해제 버튼
+ * 대시보드 상단 헤더:
+ * - 스마트폰 시스템 상태바(시계, 배터리)와 겹치지 않도록 statusBarsPadding 적용
+ * - "LYWSD02 BLE" 문구와 기기검색 버튼을 같은 줄(Row)에 배치
+ * - 짙은 글씨색(InkPrimary)을 적용하여 뛰어난 시인성 제공
+ * - "연결 안 됨" 배지 제거
  */
 @Composable
 fun HeaderSection(
@@ -57,64 +58,56 @@ fun HeaderSection(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = DeepTeal,
-        shadowElevation = 4.dp
+        color = SurfaceWhite,
+        shadowElevation = 2.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .statusBarsPadding()
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 앱 타이틀 & 로고 아이콘
+                // 좌측: 로고 아이콘 및 LYWSD02 BLE 타이틀 (동일 줄)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
+                            .size(36.dp)
                             .clip(CircleShape)
-                            .background(TealPrimary),
+                            .background(TealPrimary.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Bluetooth,
                             contentDescription = "Bluetooth Logo",
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
+                            tint = TealPrimary,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = "LYWSD02 BLE",
-                            color = Color.White,
-                            fontSize = 20.sp,
+                            color = InkPrimary, // 짙은 색으로 시인성 강화
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 0.5.sp
+                            letterSpacing = 0.3.sp
                         )
                         Text(
-                            text = "Xiaomi Mijia 센서 대시보드",
-                            color = CyanAccent,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
+                            text = "Xiaomi Mijia 센서 툴",
+                            color = TealPrimary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
 
-                // 상태 뱃지
-                StatusBadge(connectionState = connectionState)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 주요 제어 버튼 (기기 검색 / 연결 해제)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
+                // 우측: 기기 검색 / 연결 취소 / 연결 해제 버튼 (동일 줄에 배치)
                 when (connectionState) {
                     ConnectionState.CONNECTED -> {
                         Button(
@@ -123,15 +116,16 @@ fun HeaderSection(
                                 containerColor = StatusRed,
                                 contentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.height(38.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "연결 해제", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "연결 해제", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     ConnectionState.CONNECTING -> {
@@ -141,15 +135,16 @@ fun HeaderSection(
                                 containerColor = StatusAmber,
                                 contentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.height(38.dp)
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(14.dp),
                                 color = Color.White,
                                 strokeWidth = 2.dp
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "연결 취소", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "연결 취소", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     ConnectionState.SCANNING -> {
@@ -159,15 +154,16 @@ fun HeaderSection(
                                 containerColor = TealPrimary,
                                 contentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.height(38.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.BluetoothSearching,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(14.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "검색 중...", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "검색 중...", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     ConnectionState.DISCONNECTED -> {
@@ -177,78 +173,21 @@ fun HeaderSection(
                                 containerColor = TealPrimary,
                                 contentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.height(38.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Bluetooth,
+                                imageVector = Icons.Default.Search,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "기기 검색", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "기기 검색", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
+            HorizontalDivider(color = BorderLine, thickness = 1.dp)
         }
     }
 }
-
-/**
- * 연결 상태를 시각적으로 나타내는 인디케이터 배지
- */
-@Composable
-private fun StatusBadge(connectionState: ConnectionState) {
-    val (bgColor, textColor, label, dotColor) = when (connectionState) {
-        ConnectionState.CONNECTED -> Quadruple(
-            Color(0xFFE8F5E9),
-            Color(0xFF2E7D32),
-            "연결됨",
-            StatusGreen
-        )
-        ConnectionState.CONNECTING -> Quadruple(
-            Color(0xFFFFF8E1),
-            Color(0xFFF57F17),
-            "연결 중...",
-            StatusAmber
-        )
-        ConnectionState.SCANNING -> Quadruple(
-            Color(0xFFE0F7FA),
-            Color(0xFF006064),
-            "탐색 중",
-            CyanAccent
-        )
-        ConnectionState.DISCONNECTED -> Quadruple(
-            Color(0xFFFFEBEE),
-            Color(0xFFC62828),
-            "연결 안 됨",
-            StatusRed
-        )
-    }
-
-    Surface(
-        color = bgColor,
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(dotColor)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = label,
-                color = textColor,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)

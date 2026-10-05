@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -92,12 +94,14 @@ fun SensorMetricsGrid(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 온도 & 습도 가로 2열 배치
+        // 온도 & 습도 가로 2열 배치 (상하 길이 동일하게 맞춤)
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 온도 카드
+            // 온도 카드 (0°C ~ 40°C 기준 프로그레스 바 포함하여 습도 카드와 대칭 높이 유지)
             val displayTemp = if (temperatureC != null) {
                 if (unit == TemperatureUnit.FAHRENHEIT) {
                     val f = (temperatureC * 9f / 5f) + 32f
@@ -108,14 +112,22 @@ fun SensorMetricsGrid(
             } else {
                 "--.- °C"
             }
+            val tempProgress = if (temperatureC != null) {
+                ((temperatureC - 0f) / 40f).coerceIn(0f, 1f)
+            } else 0f
+            val animatedTemp by animateFloatAsState(targetValue = tempProgress, label = "tempProgress")
 
             MetricCard(
                 title = "현재 온도",
                 value = displayTemp,
                 icon = Icons.Default.DeviceThermostat,
                 iconTint = TealPrimary,
+                progress = animatedTemp,
+                progressColor = TealPrimary,
                 timestamp = lastMeasurementTime,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
 
             // 습도 카드
@@ -131,7 +143,9 @@ fun SensorMetricsGrid(
                 progress = animatedHumidity,
                 progressColor = CyanAccent,
                 timestamp = lastMeasurementTime,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
         }
 

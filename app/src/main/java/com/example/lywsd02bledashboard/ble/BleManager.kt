@@ -107,19 +107,20 @@ class BleManager(
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             result?.device?.let { device ->
-                val name = device.name ?: result.scanRecord?.deviceName ?: "알 수 없는 기기"
+                val name = device.name ?: result.scanRecord?.deviceName ?: ""
                 val address = device.address
 
-                // LYWSD02 또는 관련 센서만 필터링하거나 전체 목록에 추가
-                val isTarget = name.contains("LYWSD02", ignoreCase = true) ||
-                        name.contains("Mijia", ignoreCase = true)
+                // 사용자의 요청에 따라 'LYWSD02'로 시작하는 기기만 목록에 표시합니다.
+                if (!name.startsWith("LYWSD02", ignoreCase = true)) {
+                    return
+                }
 
                 val currentList = _scannedDevices.value.toMutableList()
                 val existingIndex = currentList.indexOfFirst { it.address == address }
 
                 val info = ScannedDeviceInfo(
                     address = address,
-                    name = if (isTarget && !name.contains("LYWSD02")) "LYWSD02 ($name)" else name,
+                    name = name,
                     rssi = result.rssi
                 )
 

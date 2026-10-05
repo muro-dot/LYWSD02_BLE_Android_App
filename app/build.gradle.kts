@@ -83,3 +83,32 @@ dependencies {
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 }
+
+// 로컬 환경설정(local.properties) 또는 환경 변수에 배포 경로가 지정된 경우 APK 자동 복사
+val localProps = java.util.Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { localProps.load(it) }
+}
+val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
+
+if (!deployDir.isNullOrBlank()) {
+    val copyApkToDeployDir = tasks.register<Copy>("copyApkToDeployDir") {
+        val apkFolder = layout.buildDirectory.dir("outputs/apk/debug")
+        from(apkFolder) {
+            include("app-debug.apk")
+            rename("app-debug.apk", "LYWSD02_BLE_Tool.apk")
+        }
+        from(apkFolder) {
+            include("app-debug.apk")
+        }
+        into(file(deployDir))
+    }
+
+    afterEvaluate {
+        tasks.named("assembleDebug").configure {
+            finalizedBy(copyApkToDeployDir)
+        }
+    }
+}
+

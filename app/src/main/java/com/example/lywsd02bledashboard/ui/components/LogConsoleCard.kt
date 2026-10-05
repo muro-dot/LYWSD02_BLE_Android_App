@@ -1,6 +1,7 @@
 package com.example.lywsd02bledashboard.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,18 +38,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lywsd02bledashboard.model.LogEntry
 import com.example.lywsd02bledashboard.model.LogType
-import com.example.lywsd02bledashboard.theme.CyanAccent
-import com.example.lywsd02bledashboard.theme.DeepTeal2
+import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusAmber
 import com.example.lywsd02bledashboard.theme.StatusGreen
 import com.example.lywsd02bledashboard.theme.StatusRed
+import com.example.lywsd02bledashboard.theme.SurfaceSoft
 import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 
 /**
- * 실시간 BLE 이벤트 로그 콘솔 카드
+ * 실시간 BLE 이벤트 로그 콘솔 카드 (일관된 라이트 테마 적용)
  */
 @Composable
 fun LogConsoleCard(
@@ -83,13 +83,13 @@ fun LogConsoleCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(DeepTeal2),
+                            .background(TealPrimary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Terminal,
                             contentDescription = null,
-                            tint = CyanAccent,
+                            tint = TealPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -125,18 +125,20 @@ fun LogConsoleCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
+            // 라이트 테마 로그 박스
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 120.dp, max = 220.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(DeepTeal2)
+                    .background(SurfaceSoft)
+                    .border(1.dp, BorderLine, RoundedCornerShape(8.dp))
                     .padding(12.dp)
             ) {
                 if (logs.isEmpty()) {
                     Text(
                         text = "기록된 로그가 없습니다.",
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = InkMuted,
                         fontSize = 12.sp,
                         fontFamily = FontFamily.Monospace,
                         modifier = Modifier.align(Alignment.Center)
@@ -151,7 +153,7 @@ fun LogConsoleCard(
                                 LogType.SUCCESS -> StatusGreen
                                 LogType.WARNING -> StatusAmber
                                 LogType.ERROR -> StatusRed
-                                LogType.INFO -> CyanAccent
+                                LogType.INFO -> TealPrimary
                             }
 
                             Row(
@@ -169,14 +171,14 @@ fun LogConsoleCard(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "[${log.formattedTime()}]",
-                                    color = Color.White.copy(alpha = 0.5f),
+                                    color = InkMuted,
                                     fontSize = 11.sp,
                                     fontFamily = FontFamily.Monospace
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = log.message,
-                                    color = Color.White,
+                                    color = InkPrimary, // 짙은 글씨색으로 시인성 확보
                                     fontSize = 12.sp,
                                     fontFamily = FontFamily.Monospace,
                                     modifier = Modifier.weight(1f)
