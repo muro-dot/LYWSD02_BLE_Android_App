@@ -1,6 +1,9 @@
 # 📡 LYWSD02 BLE Tool (Android) 🌡️
 
-Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안드로이드 스마트폰에서 실시간으로 모니터링하고 시계 및 설정을 제어할 수 있는 네이티브 안드로이드 앱입니다.
+<p align="center">
+  <strong>Native Android application for Xiaomi Mijia LYWSD02 Bluetooth Temperature & Humidity Clock</strong><br>
+  <a href="#korean-한국어">한국어</a> · <a href="#english">English</a>
+</p>
 
 <p align="center">
   <img src="img/app_screenshot.png" alt="LYWSD02 BLE Tool Android App Screenshot" width="380">
@@ -8,7 +11,12 @@ Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안�
 
 ---
 
-## ✨ 주요 기능
+<a id="korean-한국어"></a>
+## 🇰🇷 한국어 설명
+
+Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안드로이드 스마트폰에서 실시간으로 모니터링하고 시계 및 설정을 제어할 수 있는 네이티브 안드로이드 앱입니다.
+
+### ✨ 주요 기능
 
 | 기능 | 설명 |
 | :--- | :--- |
@@ -21,19 +29,37 @@ Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안�
 
 ---
 
-## 🛠️ 기술 스택 및 빌드
+<a id="english"></a>
+## 🇺🇸 English Description
+
+A native Android application designed to monitor and configure your Xiaomi Mijia **LYWSD02** (and LYWSD02MMC) Bluetooth Low Energy (BLE) temperature and humidity clock in real time with a crisp, high-contrast light UI.
+
+### ✨ Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| ⏰ **Clock Synchronization** | Perfectly synchronizes sensor time down to the second with smartphone time and timezone offset. Features automatic clock drift calibration when drift exceeds 10 seconds. |
+| ⚙️ **Display & Unit Settings** | Permanently save Celsius (°C) / Fahrenheit (°F) display preferences directly into device flash, and toggle between 12-hour and 24-hour display modes. |
+| 🌡️ **Real-Time Sensor Monitoring** | Live streaming of ambient temperature, relative humidity, and battery percentage with animated gauge progress bars. |
+| 📊 **Historical Records & CSV Export** | Fetch up to 96 hours of hourly min/max temperature & humidity statistics from internal sensor memory and export/share via CSV. |
+| 🏷️ **Device Management & Aliases** | Assign friendly names (e.g., 'Living Room', 'Bedroom') to sensors and quickly reconnect with a single tap from recent devices. |
+| 📋 **Light Theme Event Console** | Diagnostic console showing real-time BLE packet reception, synchronization events, and connection status in high contrast. |
+
+---
+
+## 🛠️ 기술 스택 및 빌드 (Tech Stack & Build)
 
 - **Language**: Kotlin 2.3.20 (Toolchain Java 17)
 - **UI Framework**: Jetpack Compose, Material 3
 - **Architecture**: MVVM + Clean Architecture, Coroutines Flow
 - **Min SDK**: Android 7.0 (API 24) / **Target SDK**: Android 16 (API 36)
-- **Permissions**: Android 12+ 런타임 BLE 권한 완벽 지원
+- **Permissions**: Full Android 12+ runtime BLE permission handling (`BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`)
 
 ```bash
-# 디버그 APK 빌드
+# Debug APK Build
 ./gradlew assembleDebug
 
-# 단위 테스트 실행
+# Run Unit Tests
 ./gradlew testDebugUnitTest
 ```
 
@@ -42,4 +68,5 @@ Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안�
 ## 📜 출처 및 라이선스 (Attribution & License)
 
 - 본 프로젝트는 [drslid/LYWSD02_BLE_Dashboard](https://github.com/drslid/LYWSD02_BLE_Dashboard) 웹 프로젝트의 BLE 통신 프로토콜 및 UI 디자인 컨셉을 기반으로 안드로이드 네이티브 앱으로 재구현되었습니다.
-- 라이선스: **GNU General Public License v3.0 (GPL-3.0)**
+- Re-implemented natively based on the BLE protocol and UI concept of [drslid/LYWSD02_BLE_Dashboard](https://github.com/drslid/LYWSD02_BLE_Dashboard).
+- License: **GNU General Public License v3.0 (GPL-3.0)**
