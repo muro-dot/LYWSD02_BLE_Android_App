@@ -3,6 +3,9 @@
 <p align="center">
   <strong>Native Android application for Xiaomi Mijia LYWSD02 Bluetooth Temperature & Humidity Clock</strong>
 </p>
+<p align="center">
+  <img src="img/app_screenshot.png" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
+</p>
 ---
 
 ## 📖 Overview
