@@ -2,6 +2,10 @@
 
 Xiaomi Mijia **LYWSD02** (및 LYWSD02MMC) 블루투스 온습도 시계를 안드로이드 스마트폰에서 실시간으로 모니터링하고 시계 및 설정을 제어할 수 있는 네이티브 안드로이드 앱입니다.
 
+<p align="center">
+  <img src="img/app_screenshot.png" alt="LYWSD02 BLE Tool Android App Screenshot" width="380">
+</p>
+
 ---
 
 ## ✨ 주요 기능
