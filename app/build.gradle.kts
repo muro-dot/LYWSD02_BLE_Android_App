@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
@@ -85,10 +88,12 @@ dependencies {
 }
 
 // 로컬 환경설정(local.properties) 또는 환경 변수에 배포 경로가 지정된 경우 APK 자동 복사
-val localProps = java.util.Properties()
+val localProps = Properties()
 val localPropsFile = rootProject.file("local.properties")
 if (localPropsFile.exists()) {
-    localPropsFile.inputStream().use { localProps.load(it) }
+    FileInputStream(localPropsFile).use { stream ->
+        localProps.load(stream)
+    }
 }
 val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
 

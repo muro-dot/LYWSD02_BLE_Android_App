@@ -252,7 +252,8 @@ fun ClockSettingsCard(
 
                 ExposedDropdownMenu(
                     expanded = expandedTimezone,
-                    onDismissRequest = { expandedTimezone = false }
+                    onDismissRequest = { expandedTimezone = false },
+                    modifier = Modifier.background(SurfaceWhite)
                 ) {
                     BleConstants.TIMEZONE_OFFSETS.forEach { offset ->
                         DropdownMenuItem(

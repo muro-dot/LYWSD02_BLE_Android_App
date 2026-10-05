@@ -222,7 +222,8 @@ fun HistoryCard(
 
                     ExposedDropdownMenu(
                         expanded = expandedLimit,
-                        onDismissRequest = { expandedLimit = false }
+                        onDismissRequest = { expandedLimit = false },
+                        modifier = Modifier.background(SurfaceWhite)
                     ) {
                         limits.forEach { lim ->
                             DropdownMenuItem(

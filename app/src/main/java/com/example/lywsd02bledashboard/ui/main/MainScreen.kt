@@ -49,6 +49,7 @@ fun MainScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        containerColor = BackgroundPaper,
         topBar = {
             HeaderSection(
                 connectionState = state.connectionState,
