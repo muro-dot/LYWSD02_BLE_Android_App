@@ -6,6 +6,11 @@
 <p align="center">
   <img src="img/Screenshot_20261005_171937_LYWSD02 BLE Dashboard.jpg" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
 </p>
+<p align="center">
+  <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest"><img src="https://img.shields.io/github/v/release/muro-dot/LYWSD02_BLE_Tool?color=blue&label=Latest%20Release" alt="Latest Release"></a>
+  <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.0.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
+  <img src="https://img.shields.io/badge/License-GPL--3.0-orange" alt="License">
+</p>
 ---
 
 ## 📖 Overview
@@ -35,6 +40,15 @@
 - **Minimum SDK**: Android 7.0 (API 24)
 - **Target SDK**: Android 16 (API 36)
 - **Bluetooth**: Android BLE API with full Android 12+ runtime permission handling (`BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`)
+
+---
+
+## 📥 Download & Install
+
+You can download the pre-compiled APK directly from the [GitHub Releases](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest) page:
+
+- 📦 **Latest APK**: [LYWSD02_BLE_Tool_v1.0.apk](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.0.apk)
+- Requires Android 7.0 (API 24) or higher.
 
 ---
 
