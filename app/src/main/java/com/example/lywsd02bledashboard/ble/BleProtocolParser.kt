@@ -1,5 +1,6 @@
 package com.example.lywsd02bledashboard.ble
 
+import com.example.lywsd02bledashboard.model.BleConstants
 import com.example.lywsd02bledashboard.model.ClockDisplayMode
 import com.example.lywsd02bledashboard.model.HistoryRecord
 import com.example.lywsd02bledashboard.model.TemperatureUnit
@@ -73,6 +74,13 @@ object BleProtocolParser {
     )
 
     /**
+     * 가장 가까운 표준 타임존 오프셋(분) 찾기
+     */
+    fun nearestTimezoneOffset(minutes: Int): Int {
+        return BleConstants.TIMEZONE_OFFSETS.minByOrNull { Math.abs(it - minutes) } ?: 0
+    }
+
+    /**
      * 기기 시간 캐릭터리스틱 값 읽기 결과 분석
      */
     fun parseTime(
@@ -92,6 +100,15 @@ object BleProtocolParser {
         // 드리프트(오차 초): 기기 시간 - 현재 스마트폰 시간(목표 타임존 반영)
         val drift = localEpoch - nowEpoch - (desiredOffsetMinutes * 60L)
 
+        // 기기 실제 타임존 추론 (30분/45분 단위 타임존 및 정수 시간 지원)
+        val approximateOffset = Math.round((localEpoch - nowEpoch) / 60.0).toInt()
+        val inferredOffset = nearestTimezoneOffset(approximateOffset)
+        val deviceTimezoneMinutes = if (Math.abs(approximateOffset - inferredOffset) <= 5) {
+            inferredOffset
+        } else {
+            timezoneHours * 60
+        }
+
         // 기기 시계 표시 포맷팅 (UTC 기준으로 포맷하여 로컬 Epoch 표시)
         val date = Date(localEpoch * 1000L)
         val pattern = if (isTwelveHour) "hh:mm:ss a" else "HH:mm:ss"
@@ -99,8 +116,6 @@ object BleProtocolParser {
             timeZone = TimeZone.getTimeZone("UTC")
         }
         val formattedTime = sdf.format(date)
-
-        val deviceTimezoneMinutes = timezoneHours * 60
 
         return ParsedTimeResult(
             localEpochSeconds = localEpoch,
@@ -120,7 +135,7 @@ object BleProtocolParser {
         manualOffsetMinutes: Int = 0,
         automatic: Boolean = false
     ): ByteArray {
-        val timezoneByte = (desiredOffsetMinutes / 60).toByte()
+        val timezoneByte = Math.floor(desiredOffsetMinutes / 60.0).toInt().toByte()
         val minuteRemainder = desiredOffsetMinutes - (timezoneByte.toInt() * 60)
         val correctionSeconds = if (automatic) 0 else manualOffsetMinutes * 60
         val nowEpoch = System.currentTimeMillis() / 1000L

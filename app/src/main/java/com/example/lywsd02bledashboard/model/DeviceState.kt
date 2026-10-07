@@ -49,7 +49,8 @@ data class DashboardUiState(
 
     // 기기 시계 및 시간 설정
     val deviceTimeFormatted: String? = null,
-    val deviceTimezoneMinutes: Int = 540, // 기본값: 한국 표준시 UTC+9 (540분)
+    val deviceTimezoneMinutes: Int? = null, // 센서 내부 현재 타임존 (기기에서 읽은 값)
+    val targetTimezoneMinutes: Int = 540, // 동기화 목표 타임존 (사용자가 선택한 값, 기본값: 시스템/KST 540분)
     val clockDriftSeconds: Long? = null,
     val clockMode: ClockDisplayMode = ClockDisplayMode.MODE_24H,
     val manualOffsetMinutes: Int = 0,

@@ -73,7 +73,8 @@ import com.example.lywsd02bledashboard.theme.TealPrimary
 @Composable
 fun ClockSettingsCard(
     deviceTimeFormatted: String?,
-    deviceTimezoneMinutes: Int,
+    deviceTimezoneMinutes: Int?,
+    targetTimezoneMinutes: Int,
     clockDriftSeconds: Long?,
     clockMode: ClockDisplayMode,
     manualOffsetMinutes: Int,
@@ -180,7 +181,11 @@ fun ClockSettingsCard(
                     // 시간 오차 상태
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes),
+                            text = if (deviceTimezoneMinutes != null) {
+                                "센서: ${BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes)}"
+                            } else {
+                                "센서: --:--"
+                            },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimary
@@ -212,11 +217,11 @@ fun ClockSettingsCard(
             var expandedTimezone by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expandedTimezone,
-                onExpandedChange = { if (isConnected) expandedTimezone = !expandedTimezone },
+                onExpandedChange = { expandedTimezone = !expandedTimezone },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 androidx.compose.material3.OutlinedTextField(
-                    value = "${BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes)} (${getTimezoneDescription(deviceTimezoneMinutes)})",
+                    value = "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})",
                     onValueChange = {},
                     readOnly = true,
                     label = { 
@@ -400,13 +405,22 @@ private fun getTimezoneDescription(minutes: Int): String {
     return when (minutes) {
         540 -> "대한민국, 일본 (KST/JST)"
         480 -> "중국, 대만, 싱가포르 (CST)"
-        0 -> "그리니치, 영국 (UTC/GMT)"
+        420 -> "베트남, 태국, 인도네시아 서부 (ICT)"
+        330 -> "인도, 스리랑카 (IST)"
+        240 -> "UAE, 두바이 (GST)"
+        180 -> "사우디, 튀르키예, 모스크바 (MSK/AST)"
+        120 -> "그리스, 이집트, 남아공 (EET/SAST)"
         60 -> "중앙유럽 (CET)"
+        0 -> "그리니치, 영국, 포르투갈 (UTC/GMT)"
+        -180 -> "브라질, 아르헨티나 (BRT/ART)"
         -300 -> "미국 동부 (EST)"
         -360 -> "미국 중부 (CST)"
         -420 -> "미국 산악 (MST)"
         -480 -> "미국 서부 (PST)"
-        330 -> "인도 (IST)"
+        -540 -> "알래스카 (AKST)"
+        -600 -> "하와이 (HST)"
+        600 -> "호주 동부, 괌 (AEST/ChST)"
+        720 -> "뉴질랜드 (NZST)"
         else -> "오프셋 $minutes 분"
     }
 }

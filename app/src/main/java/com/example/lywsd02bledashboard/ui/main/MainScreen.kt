@@ -94,6 +94,7 @@ fun MainScreen(
             ClockSettingsCard(
                 deviceTimeFormatted = state.deviceTimeFormatted,
                 deviceTimezoneMinutes = state.deviceTimezoneMinutes,
+                targetTimezoneMinutes = state.targetTimezoneMinutes,
                 clockDriftSeconds = state.clockDriftSeconds,
                 clockMode = state.clockMode,
                 manualOffsetMinutes = state.manualOffsetMinutes,

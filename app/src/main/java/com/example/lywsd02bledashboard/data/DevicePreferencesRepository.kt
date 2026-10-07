@@ -2,10 +2,12 @@ package com.example.lywsd02bledashboard.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.lywsd02bledashboard.ble.BleProtocolParser
 import com.example.lywsd02bledashboard.model.KnownDevice
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.TimeZone
 
 /**
  * 기기 별칭, 연결 히스토리, 사용자 환경 설정을 로컬에 보관하는 저장소.
@@ -161,9 +163,13 @@ class DevicePreferencesRepository(context: Context) {
         set(value) = prefs.edit().putString(KEY_DEFAULT_UNIT, value.name).apply()
 
     /**
-     * 사용자 타임존 오프셋 분
+     * 사용자 타임존 오프셋 분 (기본값: 스마트폰 시스템 현재 타임존)
      */
     var savedTimezoneMinutes: Int
-        get() = prefs.getInt(KEY_TIMEZONE_MINUTES, 540) // KST: UTC+9 (540분)
+        get() {
+            val systemOffsetMinutes = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 60000
+            val defaultOffset = BleProtocolParser.nearestTimezoneOffset(systemOffsetMinutes)
+            return prefs.getInt(KEY_TIMEZONE_MINUTES, defaultOffset)
+        }
         set(value) = prefs.edit().putInt(KEY_TIMEZONE_MINUTES, value).apply()
 }

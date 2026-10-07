@@ -43,7 +43,8 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         DashboardUiState(
             isAutoSyncClockEnabled = repository.isAutoSyncClockEnabled,
             selectedUnit = repository.defaultTemperatureUnit,
-            deviceTimezoneMinutes = repository.savedTimezoneMinutes,
+            targetTimezoneMinutes = repository.savedTimezoneMinutes,
+            deviceTimezoneMinutes = null,
             knownDevices = repository.getKnownDevices()
         )
     )
@@ -172,9 +173,9 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             // 2. 온도 단위 읽기
             bleManager.readUnit()
 
-            // 3. 기기 시계 읽기
+            // 3. 기기 시계 읽기 (목표 타임존 기준으로 오차 계산)
             val timeResult = bleManager.readTime(
-                desiredOffsetMinutes = _uiState.value.deviceTimezoneMinutes,
+                desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 isTwelveHour = _uiState.value.clockMode == ClockDisplayMode.MODE_12H
             )
 
@@ -221,6 +222,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                 humidityPercentage = null,
                 batteryPercentage = null,
                 deviceTimeFormatted = null,
+                deviceTimezoneMinutes = null,
                 clockDriftSeconds = null,
                 historyRecords = emptyList()
             )
@@ -234,7 +236,10 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             it.copy(
                 connectedDeviceId = null,
                 connectedDeviceName = null,
-                connectedDeviceAlias = null
+                connectedDeviceAlias = null,
+                deviceTimeFormatted = null,
+                deviceTimezoneMinutes = null,
+                clockDriftSeconds = null
             )
         }
     }
@@ -242,7 +247,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun refreshClock() {
         viewModelScope.launch {
             bleManager.readTime(
-                desiredOffsetMinutes = _uiState.value.deviceTimezoneMinutes,
+                desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 isTwelveHour = _uiState.value.clockMode == ClockDisplayMode.MODE_12H
             )
         }
@@ -252,7 +257,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             _uiState.update { it.copy(isSyncingClock = true) }
             bleManager.syncTime(
-                desiredOffsetMinutes = _uiState.value.deviceTimezoneMinutes,
+                desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 manualOffsetMinutes = _uiState.value.manualOffsetMinutes,
                 clockMode = _uiState.value.clockMode,
                 automatic = isAutomatic
@@ -267,8 +272,10 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     fun setTimezoneMinutes(minutes: Int) {
         repository.savedTimezoneMinutes = minutes
-        _uiState.update { it.copy(deviceTimezoneMinutes = minutes) }
-        refreshClock()
+        _uiState.update { it.copy(targetTimezoneMinutes = minutes) }
+        if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
+            refreshClock()
+        }
     }
 
     fun setManualOffsetMinutes(minutes: Int) {

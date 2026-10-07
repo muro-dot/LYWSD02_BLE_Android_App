@@ -147,5 +147,50 @@ class BleProtocolParserTest {
         assertEquals("UTC+09:00", BleProtocolParser.formatTimezoneOffset(540))
         assertEquals("UTC-05:00", BleProtocolParser.formatTimezoneOffset(-300))
         assertEquals("UTC+00:00", BleProtocolParser.formatTimezoneOffset(0))
+        assertEquals("UTC+05:30", BleProtocolParser.formatTimezoneOffset(330))
+        assertEquals("UTC-03:30", BleProtocolParser.formatTimezoneOffset(-210))
+    }
+
+    @Test
+    fun testNearestTimezoneOffset() {
+        assertEquals(540, BleProtocolParser.nearestTimezoneOffset(540))
+        assertEquals(540, BleProtocolParser.nearestTimezoneOffset(538)) // 2분 오차는 540에 매칭
+        assertEquals(330, BleProtocolParser.nearestTimezoneOffset(330)) // 인도 5시간 30분
+        assertEquals(-300, BleProtocolParser.nearestTimezoneOffset(-300))
+        assertEquals(0, BleProtocolParser.nearestTimezoneOffset(0))
+    }
+
+    @Test
+    fun testEncodeTimeSync_fractionalAndNegativeTimezones() {
+        // 1. 인도 UTC+5:30 (330분)
+        val payloadIndia = BleProtocolParser.encodeTimeSync(desiredOffsetMinutes = 330, automatic = true)
+        assertEquals(5.toByte(), payloadIndia[4]) // floor(330/60) = 5
+
+        // 2. 음수 분단위 타임존 UTC-3:30 (-210분)
+        val payloadNegative = BleProtocolParser.encodeTimeSync(desiredOffsetMinutes = -210, automatic = true)
+        assertEquals((-4).toByte(), payloadNegative[4]) // floor(-210/60) = -4
+
+        // 3. 음수 정수 타임존 UTC-5:00 (-300분)
+        val payloadEst = BleProtocolParser.encodeTimeSync(desiredOffsetMinutes = -300, automatic = true)
+        assertEquals((-5).toByte(), payloadEst[4]) // floor(-300/60) = -5
+    }
+
+    @Test
+    fun testParseTime_timezoneInference() {
+        val nowEpoch = System.currentTimeMillis() / 1000L
+        val buffer = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(nowEpoch.toInt())
+        buffer.put(9.toByte()) // UTC+9
+
+        val result = BleProtocolParser.parseTime(
+            bytes = buffer.array(),
+            desiredOffsetMinutes = 540,
+            isTwelveHour = false
+        )
+
+        assertNotNull(result)
+        assertEquals(540, result!!.deviceTimezoneMinutes)
+        // 오차는 1초 이내여야 함
+        assertTrue(Math.abs(result.driftSeconds) <= 2)
     }
 }
