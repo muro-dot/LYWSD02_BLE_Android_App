@@ -81,6 +81,14 @@ object BleProtocolParser {
     }
 
     /**
+     * 현재 스마트폰 시스템의 실제 타임존 분 오프셋 반환 (서머타임 반영 및 표준 오프셋 매칭)
+     */
+    fun getSystemTimezoneOffsetMinutes(): Int {
+        val systemOffsetMinutes = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 60000
+        return nearestTimezoneOffset(systemOffsetMinutes)
+    }
+
+    /**
      * 기기 시간 캐릭터리스틱 값 읽기 결과 분석
      */
     fun parseTime(

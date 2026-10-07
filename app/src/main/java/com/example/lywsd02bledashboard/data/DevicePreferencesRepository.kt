@@ -23,6 +23,7 @@ class DevicePreferencesRepository(context: Context) {
         private const val KEY_AUTO_SYNC_CLOCK = "auto_sync_clock"
         private const val KEY_DEFAULT_UNIT = "default_unit"
         private const val KEY_TIMEZONE_MINUTES = "timezone_minutes"
+        private const val KEY_USE_SYSTEM_TIMEZONE = "use_system_timezone"
     }
 
     /**
@@ -163,13 +164,24 @@ class DevicePreferencesRepository(context: Context) {
         set(value) = prefs.edit().putString(KEY_DEFAULT_UNIT, value.name).apply()
 
     /**
-     * 사용자 타임존 오프셋 분 (기본값: 스마트폰 시스템 현재 타임존)
+     * 스마트폰 시스템 타임존 자동 사용 여부 (기본값: true)
+     */
+    var useSystemTimezone: Boolean
+        get() = prefs.getBoolean(KEY_USE_SYSTEM_TIMEZONE, true)
+        set(value) = prefs.edit().putBoolean(KEY_USE_SYSTEM_TIMEZONE, value).apply()
+
+    /**
+     * 사용자 타임존 오프셋 분
+     * useSystemTimezone이 true이면 항상 스마트폰 시스템 현재 타임존을 실시간으로 반환합니다.
      */
     var savedTimezoneMinutes: Int
         get() {
-            val systemOffsetMinutes = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 60000
-            val defaultOffset = BleProtocolParser.nearestTimezoneOffset(systemOffsetMinutes)
-            return prefs.getInt(KEY_TIMEZONE_MINUTES, defaultOffset)
+            if (useSystemTimezone) {
+                return BleProtocolParser.getSystemTimezoneOffsetMinutes()
+            }
+            return prefs.getInt(KEY_TIMEZONE_MINUTES, BleProtocolParser.getSystemTimezoneOffsetMinutes())
         }
-        set(value) = prefs.edit().putInt(KEY_TIMEZONE_MINUTES, value).apply()
+        set(value) {
+            prefs.edit().putInt(KEY_TIMEZONE_MINUTES, value).apply()
+        }
 }

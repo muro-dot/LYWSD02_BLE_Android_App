@@ -95,6 +95,7 @@ fun MainScreen(
                 deviceTimeFormatted = state.deviceTimeFormatted,
                 deviceTimezoneMinutes = state.deviceTimezoneMinutes,
                 targetTimezoneMinutes = state.targetTimezoneMinutes,
+                isUsingSystemTimezone = state.isUsingSystemTimezone,
                 clockDriftSeconds = state.clockDriftSeconds,
                 clockMode = state.clockMode,
                 manualOffsetMinutes = state.manualOffsetMinutes,
@@ -105,6 +106,7 @@ fun MainScreen(
                 onSyncClock = { viewModel.syncClock() },
                 onClockModeChange = { viewModel.setClockMode(it) },
                 onTimezoneChange = { viewModel.setTimezoneMinutes(it) },
+                onSelectSystemTimezone = { viewModel.setSystemTimezone() },
                 onManualOffsetChange = { viewModel.setManualOffsetMinutes(it) },
                 onAutoSyncChange = { viewModel.setAutoSyncClockEnabled(it) }
             )

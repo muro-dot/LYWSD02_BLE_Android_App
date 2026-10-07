@@ -29,6 +29,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -75,6 +76,7 @@ fun ClockSettingsCard(
     deviceTimeFormatted: String?,
     deviceTimezoneMinutes: Int?,
     targetTimezoneMinutes: Int,
+    isUsingSystemTimezone: Boolean,
     clockDriftSeconds: Long?,
     clockMode: ClockDisplayMode,
     manualOffsetMinutes: Int,
@@ -85,6 +87,7 @@ fun ClockSettingsCard(
     onSyncClock: () -> Unit,
     onClockModeChange: (ClockDisplayMode) -> Unit,
     onTimezoneChange: (Int) -> Unit,
+    onSelectSystemTimezone: () -> Unit,
     onManualOffsetChange: (Int) -> Unit,
     onAutoSyncChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -220,13 +223,18 @@ fun ClockSettingsCard(
                 onExpandedChange = { expandedTimezone = !expandedTimezone },
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val textFieldValue = if (isUsingSystemTimezone) {
+                    "📱 [시스템] ${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
+                } else {
+                    "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
+                }
                 androidx.compose.material3.OutlinedTextField(
-                    value = "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})",
+                    value = textFieldValue,
                     onValueChange = {},
                     readOnly = true,
                     label = { 
                         Text(
-                            text = "목표 타임존 (Timezone)", 
+                            text = if (isUsingSystemTimezone) "목표 타임존 (스마트폰 연동 중)" else "목표 타임존 (수동 설정)", 
                             color = InkPrimary, 
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp
@@ -246,7 +254,7 @@ fun ClockSettingsCard(
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontWeight = FontWeight.SemiBold,
                         color = InkPrimary,
-                        fontSize = 14.sp
+                        fontSize = 13.sp
                     ),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTimezone) },
                     modifier = Modifier
@@ -260,6 +268,48 @@ fun ClockSettingsCard(
                     onDismissRequest = { expandedTimezone = false },
                     modifier = Modifier.background(SurfaceWhite)
                 ) {
+                    val systemOffset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
+                    // 1. 스마트폰 시스템 타임존 (항상 최상단에 노출)
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = "📱", fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = "스마트폰 시스템 타임존",
+                                            fontWeight = FontWeight.Bold,
+                                            color = TealPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                        if (isUsingSystemTimezone) {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "현재 선택됨",
+                                                color = StatusGreen,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
+                                    }
+                                    Text(
+                                        text = "${BleProtocolParser.formatTimezoneOffset(systemOffset)} (${getTimezoneDescription(systemOffset)})",
+                                        color = InkPrimary,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            onSelectSystemTimezone()
+                            expandedTimezone = false
+                        }
+                    )
+                    HorizontalDivider(color = BorderLine, modifier = Modifier.padding(vertical = 4.dp))
+
+                    // 2. 전세계 표준 타임존 목록
                     BleConstants.TIMEZONE_OFFSETS.forEach { offset ->
                         DropdownMenuItem(
                             text = {
@@ -273,6 +323,25 @@ fun ClockSettingsCard(
                                 onTimezoneChange(offset)
                                 expandedTimezone = false
                             }
+                        )
+                    }
+                }
+            }
+
+            if (!isUsingSystemTimezone) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    androidx.compose.material3.TextButton(
+                        onClick = onSelectSystemTimezone
+                    ) {
+                        Text(
+                            text = "📱 폰 시스템 타임존으로 되돌리기",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TealPrimary
                         )
                     }
                 }

@@ -51,6 +51,7 @@ data class DashboardUiState(
     val deviceTimeFormatted: String? = null,
     val deviceTimezoneMinutes: Int? = null, // 센서 내부 현재 타임존 (기기에서 읽은 값)
     val targetTimezoneMinutes: Int = 540, // 동기화 목표 타임존 (사용자가 선택한 값, 기본값: 시스템/KST 540분)
+    val isUsingSystemTimezone: Boolean = true, // 스마트폰 시스템 타임존 추종 여부
     val clockDriftSeconds: Long? = null,
     val clockMode: ClockDisplayMode = ClockDisplayMode.MODE_24H,
     val manualOffsetMinutes: Int = 0,

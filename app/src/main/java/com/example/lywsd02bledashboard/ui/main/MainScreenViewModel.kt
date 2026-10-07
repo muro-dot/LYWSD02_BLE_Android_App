@@ -44,6 +44,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             isAutoSyncClockEnabled = repository.isAutoSyncClockEnabled,
             selectedUnit = repository.defaultTemperatureUnit,
             targetTimezoneMinutes = repository.savedTimezoneMinutes,
+            isUsingSystemTimezone = repository.useSystemTimezone,
             deviceTimezoneMinutes = null,
             knownDevices = repository.getKnownDevices()
         )
@@ -271,8 +272,32 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun setTimezoneMinutes(minutes: Int) {
+        val systemOffset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
+        val isSystem = (minutes == systemOffset)
+        repository.useSystemTimezone = isSystem
         repository.savedTimezoneMinutes = minutes
-        _uiState.update { it.copy(targetTimezoneMinutes = minutes) }
+        _uiState.update { 
+            it.copy(
+                targetTimezoneMinutes = minutes,
+                isUsingSystemTimezone = isSystem
+            ) 
+        }
+        if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
+            refreshClock()
+        }
+    }
+
+    fun setSystemTimezone() {
+        val systemOffset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
+        repository.useSystemTimezone = true
+        repository.savedTimezoneMinutes = systemOffset
+        _uiState.update {
+            it.copy(
+                targetTimezoneMinutes = systemOffset,
+                isUsingSystemTimezone = true
+            )
+        }
+        addLog("스마트폰 시스템 타임존(${BleProtocolParser.formatTimezoneOffset(systemOffset)})으로 설정되었습니다.", LogType.INFO)
         if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
             refreshClock()
         }

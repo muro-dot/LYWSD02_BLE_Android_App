@@ -193,4 +193,11 @@ class BleProtocolParserTest {
         // 오차는 1초 이내여야 함
         assertTrue(Math.abs(result.driftSeconds) <= 2)
     }
+
+    @Test
+    fun testGetSystemTimezoneOffsetMinutes() {
+        val offset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
+        // 반환된 오프셋은 유효한 표준 타임존 목록(TIMEZONE_OFFSETS)에 포함되어야 함
+        assertTrue(com.example.lywsd02bledashboard.model.BleConstants.TIMEZONE_OFFSETS.contains(offset))
+    }
 }
