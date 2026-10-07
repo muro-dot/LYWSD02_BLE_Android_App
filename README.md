@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest"><img src="https://img.shields.io/github/v/release/muro-dot/LYWSD02_BLE_Tool?color=blue&label=Latest%20Release" alt="Latest Release"></a>
-  <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.0.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
+  <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.1.0.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
   <img src="https://img.shields.io/badge/License-GPL--3.0-orange" alt="License">
 </p>
 ---
@@ -51,7 +51,7 @@
 
 You can download the pre-compiled APK directly from the [GitHub Releases](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest) page:
 
-- 📦 **Latest APK**: [LYWSD02_BLE_Tool_v1.0.apk](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.0.apk)
+- 📦 **Latest APK**: [LYWSD02_BLE_Tool_v1.1.0.apk](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.1.0.apk)
 - Requires Android 7.0 (API 24) or higher.
 
 ---
