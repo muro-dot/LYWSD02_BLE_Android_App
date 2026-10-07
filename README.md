@@ -3,12 +3,6 @@
 <p align="center">
   <strong>Native Android application for Xiaomi Mijia LYWSD02 Bluetooth Temperature & Humidity Clock</strong>
 </p>
-<p align="center">
-<img width="360" alt="LYWSD02" src="https://github.com/user-attachments/assets/fbd66c98-02ff-4f2d-ad43-b1087f127c95" />
-</p>
-<p align="center">
-  <img src="img/Screenshot_20261005_171937_LYWSD02 BLE Dashboard.jpg" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
-</p>
 
 <p align="center">
   <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest"><img src="https://img.shields.io/github/v/release/muro-dot/LYWSD02_BLE_Tool?color=blue&label=Latest%20Release" alt="Latest Release"></a>
@@ -16,6 +10,13 @@
   <a href="https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.1.1.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
   <img src="https://img.shields.io/badge/License-GPL--3.0-orange" alt="License">
 </p>
+<p align="center">
+<img width="360" alt="LYWSD02" src="https://github.com/user-attachments/assets/fbd66c98-02ff-4f2d-ad43-b1087f127c95" />
+</p>
+<p align="center">
+  <img src="img/Screenshot_20261005_171937_LYWSD02 BLE Dashboard.jpg" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
+</p>
+
 ---
 
 ## 📖 Overview
