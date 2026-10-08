@@ -17,6 +17,10 @@ import com.example.lywsd02bledashboard.model.HistoryRecord
 import com.example.lywsd02bledashboard.model.LogEntry
 import com.example.lywsd02bledashboard.model.LogType
 import com.example.lywsd02bledashboard.model.TemperatureUnit
+import com.example.lywsd02bledashboard.model.AppUpdateInfo
+import com.example.lywsd02bledashboard.model.UpdateDownloadState
+import com.example.lywsd02bledashboard.update.UpdateChecker
+import com.example.lywsd02bledashboard.update.UpdateInstaller
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +58,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     init {
         observeBleEvents()
         addLog("LYWSD02 BLE 대시보드가 준비되었습니다. 블루투스를 켜고 기기를 검색하세요.", LogType.INFO)
+        checkForUpdates()
     }
 
     private fun observeBleEvents() {
@@ -424,6 +429,102 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     fun clearLogs() {
         _uiState.update { it.copy(logs = emptyList()) }
+    }
+
+    /**
+     * 깃허브 최신 릴리즈를 비동기로 조회하여 업데이트 존재 시 알림을 띄웁니다.
+     */
+    fun checkForUpdates() {
+        viewModelScope.launch {
+            val updateInfo = UpdateChecker.checkLatestRelease(getApplication())
+            if (updateInfo != null && updateInfo.hasUpdate) {
+                _uiState.update {
+                    it.copy(
+                        appUpdateInfo = updateInfo,
+                        isUpdateDialogOpen = true,
+                        updateDownloadState = UpdateDownloadState.Idle
+                    )
+                }
+                addLog("새로운 릴리즈(v${updateInfo.latestVersion})가 발견되었습니다! 업데이트 팝업을 표시합니다.", LogType.INFO)
+            }
+        }
+    }
+
+    /**
+     * 업데이트 APK 다운로드를 시작하고 완료 시 자동 설치를 트리거합니다.
+     */
+    fun startAppUpdate() {
+        val updateInfo = _uiState.value.appUpdateInfo ?: return
+        if (updateInfo.apkDownloadUrl.isBlank()) {
+            _uiState.update {
+                it.copy(updateDownloadState = UpdateDownloadState.Error("릴리즈에 등록된 APK 다운로드 링크를 찾을 수 없습니다."))
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(updateDownloadState = UpdateDownloadState.Downloading(0))
+            }
+            addLog("최신 릴리즈 APK 다운로드를 시작합니다...", LogType.INFO)
+
+            val result = UpdateInstaller.downloadApk(
+                context = getApplication(),
+                downloadUrl = updateInfo.apkDownloadUrl,
+                targetFileName = updateInfo.apkFileName
+            ) { progress ->
+                _uiState.update {
+                    it.copy(updateDownloadState = UpdateDownloadState.Downloading(progress))
+                }
+            }
+
+            result.fold(
+                onSuccess = { file ->
+                    _uiState.update {
+                        it.copy(updateDownloadState = UpdateDownloadState.DownloadCompleted(file.absolutePath))
+                    }
+                    addLog("APK 다운로드 완료. 패키지 설치 화면을 호출합니다.", LogType.SUCCESS)
+                    installAppUpdate(file)
+                },
+                onFailure = { error ->
+                    val errorMsg = error.message ?: "다운로드 중 오류가 발생했습니다."
+                    _uiState.update {
+                        it.copy(updateDownloadState = UpdateDownloadState.Error(errorMsg))
+                    }
+                    addLog("업데이트 다운로드 실패: $errorMsg", LogType.ERROR)
+                }
+            )
+        }
+    }
+
+    /**
+     * 다운로드된 APK 파일을 패키지 인스톨러로 연결합니다.
+     */
+    fun installAppUpdate(specifiedFile: File? = null) {
+        val file = specifiedFile ?: run {
+            val path = (_uiState.value.updateDownloadState as? UpdateDownloadState.DownloadCompleted)?.apkFilePath
+            path?.let { File(it) }
+        }
+
+        if (file == null || !file.exists()) {
+            _uiState.update {
+                it.copy(updateDownloadState = UpdateDownloadState.Error("설치할 APK 파일이 존재하지 않습니다."))
+            }
+            return
+        }
+
+        val installResult = UpdateInstaller.installApk(getApplication(), file)
+        installResult.onFailure { error ->
+            val msg = error.message ?: "앱 설치 화면 호출에 실패했습니다."
+            _uiState.update {
+                it.copy(updateDownloadState = UpdateDownloadState.Error(msg))
+            }
+            addLog("앱 설치 실패: $msg", LogType.ERROR)
+        }
+    }
+
+    fun dismissUpdateDialog() {
+        _uiState.update { it.copy(isUpdateDialogOpen = false) }
     }
 
     private fun addLog(message: String, type: LogType) {

@@ -32,6 +32,7 @@ import com.example.lywsd02bledashboard.ui.components.KnownDevicesCard
 import com.example.lywsd02bledashboard.ui.components.LogConsoleCard
 import com.example.lywsd02bledashboard.ui.components.PermissionHandler
 import com.example.lywsd02bledashboard.ui.components.SensorMetricsGrid
+import com.example.lywsd02bledashboard.ui.components.UpdateDialog
 
 /**
  * LYWSD02 BLE 대시보드 메인 화면.
@@ -174,6 +175,17 @@ fun MainScreen(
             onSave = { newAlias ->
                 viewModel.saveDeviceAlias(newAlias)
             }
+        )
+    }
+
+    // 깃허브 최신 릴리즈 인앱 업데이트 팝업 다이얼로그
+    if (state.isUpdateDialogOpen && state.appUpdateInfo != null) {
+        UpdateDialog(
+            updateInfo = state.appUpdateInfo!!,
+            downloadState = state.updateDownloadState,
+            onDismiss = { viewModel.dismissUpdateDialog() },
+            onStartDownload = { viewModel.startAppUpdate() },
+            onInstall = { viewModel.installAppUpdate() }
         )
     }
 }

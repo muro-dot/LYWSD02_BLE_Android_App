@@ -77,7 +77,12 @@ data class DashboardUiState(
     // UI 다이얼로그 표시 여부
     val isScanDialogOpen: Boolean = false,
     val isRenameDialogOpen: Boolean = false,
-    val scannedDevices: List<ScannedDeviceInfo> = emptyList()
+    val scannedDevices: List<ScannedDeviceInfo> = emptyList(),
+
+    // 깃허브 최신 릴리즈 인앱 업데이트 상태
+    val appUpdateInfo: AppUpdateInfo? = null,
+    val updateDownloadState: UpdateDownloadState = UpdateDownloadState.Idle,
+    val isUpdateDialogOpen: Boolean = false
 )
 
 /**
