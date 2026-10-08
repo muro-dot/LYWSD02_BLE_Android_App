@@ -87,4 +87,10 @@ data class ScannedDeviceInfo(
     val address: String,
     val name: String,
     val rssi: Int
-)
+) {
+    /**
+     * 기기명이 'LYWSD02'를 포함하는지 여부 (최상단 정렬 및 UI 강조에 사용)
+     */
+    val isLywsd02: Boolean
+        get() = name.contains("LYWSD02", ignoreCase = true)
+}

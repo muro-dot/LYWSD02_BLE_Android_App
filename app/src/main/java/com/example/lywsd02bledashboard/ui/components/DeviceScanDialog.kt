@@ -19,7 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BluetoothSearching
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
+import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.AlertDialog
@@ -79,7 +80,7 @@ fun DeviceScanDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.BluetoothSearching,
+                            imageVector = Icons.AutoMirrored.Filled.BluetoothSearching,
                             contentDescription = null,
                             tint = TealPrimary,
                             modifier = Modifier.size(20.dp)
@@ -105,7 +106,7 @@ fun DeviceScanDialog(
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "주변의 Xiaomi LYWSD02 센서를 검색 중입니다. 목록에서 연결할 기기를 선택하세요.",
+                    text = "주변의 BLE 기기를 검색 중입니다. LYWSD02 센서가 감지되면 자동으로 최상단에 정렬 및 강조 표시됩니다.",
                     fontSize = 13.sp,
                     color = InkSecondary,
                     lineHeight = 18.sp
@@ -147,9 +148,11 @@ fun DeviceScanDialog(
                             .border(1.dp, BorderLine, RoundedCornerShape(10.dp))
                     ) {
                         items(devices, key = { it.address }) { dev ->
+                            val isLywsd02 = dev.isLywsd02
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .background(if (isLywsd02) TealPrimary.copy(alpha = 0.08f) else Color.Transparent)
                                     .clickable { onDeviceSelect(dev) }
                                     .padding(horizontal = 14.dp, vertical = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -160,19 +163,37 @@ fun DeviceScanDialog(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Sensors,
+                                        imageVector = if (isLywsd02) Icons.Default.Sensors else Icons.Default.Bluetooth,
                                         contentDescription = null,
-                                        tint = TealPrimary,
+                                        tint = if (isLywsd02) TealPrimary else InkSecondary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = dev.name,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = InkPrimary
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = dev.name,
+                                                fontSize = 14.sp,
+                                                fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
+                                                color = if (isLywsd02) TealPrimary else InkPrimary
+                                            )
+                                            if (isLywsd02) {
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(4.dp))
+                                                        .background(TealPrimary)
+                                                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "LYWSD02",
+                                                        color = Color.White,
+                                                        fontSize = 9.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+                                        }
                                         Text(
                                             text = dev.address,
                                             fontSize = 11.sp,
@@ -186,7 +207,7 @@ fun DeviceScanDialog(
                                     Icon(
                                         imageVector = Icons.Default.SignalCellularAlt,
                                         contentDescription = "신호 세기",
-                                        tint = CyanAccent,
+                                        tint = if (isLywsd02) TealPrimary else CyanAccent,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))

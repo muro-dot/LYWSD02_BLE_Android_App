@@ -102,41 +102,72 @@ class BleManager(
     private var autoRetryJob: Job? = null
     private var retryAttempt = 0
 
-    // 스캔 콜백
+    // 동시성(Race Condition) 방지를 위한 스레드 세이프 기기 목록 맵
+    private val scannedDevicesMap = java.util.concurrent.ConcurrentHashMap<String, ScannedDeviceInfo>()
+    private val scanTimeoutRunnable = Runnable { stopScan() }
+
+    // 스캔 콜백 정의
     private val scanCallback = object : ScanCallback() {
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            result?.device?.let { device ->
-                val name = device.name ?: result.scanRecord?.deviceName ?: ""
-                val address = device.address
+            processScanResult(result)
+        }
 
-                // 사용자의 요청에 따라 'LYWSD02'로 시작하는 기기만 목록에 표시합니다.
-                if (!name.startsWith("LYWSD02", ignoreCase = true)) {
-                    return
-                }
-
-                val currentList = _scannedDevices.value.toMutableList()
-                val existingIndex = currentList.indexOfFirst { it.address == address }
-
-                val info = ScannedDeviceInfo(
-                    address = address,
-                    name = name,
-                    rssi = result.rssi
-                )
-
-                if (existingIndex >= 0) {
-                    currentList[existingIndex] = info
-                } else {
-                    currentList.add(info)
-                }
-                _scannedDevices.value = currentList.sortedByDescending { it.rssi }
-            }
+        @SuppressLint("MissingPermission")
+        override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+            // 삼성 갤럭시 등 일부 제조사 기기에서 전력 절감을 위해 묶음(Batch)으로 전달하는 결과도 누락 없이 처리합니다.
+            results?.forEach { processScanResult(it) }
         }
 
         override fun onScanFailed(errorCode: Int) {
             emitLog("BLE 스캔 실패 (코드: $errorCode)", LogType.ERROR)
             _connectionState.value = ConnectionState.DISCONNECTED
         }
+    }
+
+    /**
+     * BLE 광고(Advertising) 및 응답(Scan Response) 패킷을 처리하여 기기 목록을 갱신합니다.
+     * 의도: BLE 기기는 초기 광고 패킷에 이름이 없고 이후 스캔 응답에 이름이 실려 오는 경우가 많으므로,
+     * 이름이 없더라도 우선 등록하고 이후 유효한 이름이 확인되면 덮어써서 기기가 검색에서 누락되는 현상을 방지합니다.
+     */
+    private fun processScanResult(result: ScanResult?) {
+        val device = result?.device ?: return
+        val address = device.address
+
+        // 기기명 확인: 1) BluetoothDevice.name -> 2) ScanRecord.deviceName -> 3) 이전 캐시된 이름 -> 4) 대체 문자열
+        val discoveredName = device.name?.takeIf { it.isNotBlank() }
+            ?: result.scanRecord?.deviceName?.takeIf { it.isNotBlank() }
+
+        val existing = scannedDevicesMap[address]
+        val finalName = discoveredName
+            ?: existing?.name?.takeIf { it != "(알 수 없는 기기)" && it.isNotBlank() }
+            ?: "(알 수 없는 기기)"
+
+        val info = ScannedDeviceInfo(
+            address = address,
+            name = finalName,
+            rssi = result.rssi
+        )
+
+        scannedDevicesMap[address] = info
+        updateSortedScannedDevices()
+    }
+
+    /**
+     * 발견된 기기 목록을 규칙에 따라 정렬하여 StateFlow로 방출합니다.
+     * 정렬 우선순위:
+     * 1순위: 'LYWSD02' 센서 (최상단 고정 배치)
+     * 2순위: 이름이 식별된 기타 BLE 기기
+     * 3순위: 이름이 확인되지 않은 기기
+     * 공통: 그룹 내에서는 신호 강도(RSSI)가 강한 순서(내림차순)로 정렬
+     */
+    private fun updateSortedScannedDevices() {
+        val sorted = scannedDevicesMap.values.sortedWith(
+            compareByDescending<ScannedDeviceInfo> { it.isLywsd02 }
+                .thenByDescending { it.name != "(알 수 없는 기기)" }
+                .thenByDescending { it.rssi }
+        )
+        _scannedDevices.value = sorted
     }
 
     // GATT 콜백 정의
@@ -265,7 +296,7 @@ class BleManager(
     }
 
     /**
-     * 주변 BLE 기기 검색 시작
+     * 주변 BLE 기기 검색 시작 (LYWSD02 및 모든 주변 BLE 장치 탐색)
      */
     @SuppressLint("MissingPermission")
     fun startScan() {
@@ -280,25 +311,30 @@ class BleManager(
             return
         }
 
+        // 이전 스캔 캐시 정리 및 상태 갱신
+        scannedDevicesMap.clear()
         _scannedDevices.value = emptyList()
         _connectionState.value = ConnectionState.SCANNING
-        emitLog("주변 LYWSD02 센서 검색을 시작합니다...", LogType.INFO)
+        emitLog("주변 BLE 기기 검색을 시작합니다... (LYWSD02 우선 정렬)", LogType.INFO)
 
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
             .build()
 
-        val filter = ScanFilter.Builder()
-            .setServiceUuid(ParcelUuid(BleConstants.SERVICE_UUID))
-            .build()
+        // 특정 기기에 한정하지 않고 모든 BLE 기기를 폭넓게 수신하기 위해 필터를 null로 지정합니다.
+        try {
+            scanner.startScan(null, settings, scanCallback)
+        } catch (e: Exception) {
+            emitLog("BLE 스캔 시작 중 오류 발생: ${e.message}", LogType.ERROR)
+            _connectionState.value = ConnectionState.DISCONNECTED
+            return
+        }
 
-        // 특정 UUID 필터링과 함께 검색 (일부 기기는 광고에 UUID를 포함하지 않을 수 있으므로 폭넓게 수신)
-        scanner.startScan(null, settings, scanCallback)
-
-        // 12초 후 자동 스캔 중단
-        mainHandler.postDelayed({
-            stopScan()
-        }, 12000)
+        // 12초 후 안전하게 자동 스캔 중단
+        mainHandler.removeCallbacks(scanTimeoutRunnable)
+        mainHandler.postDelayed(scanTimeoutRunnable, 12000)
     }
 
     /**
@@ -306,15 +342,14 @@ class BleManager(
      */
     @SuppressLint("MissingPermission")
     fun stopScan() {
+        mainHandler.removeCallbacks(scanTimeoutRunnable)
         if (_connectionState.value == ConnectionState.SCANNING) {
             try {
                 bluetoothAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
             } catch (e: Exception) {
                 // 무시
             }
-            if (_connectionState.value == ConnectionState.SCANNING) {
-                _connectionState.value = ConnectionState.DISCONNECTED
-            }
+            _connectionState.value = ConnectionState.DISCONNECTED
             emitLog("기기 검색이 종료되었습니다.", LogType.INFO)
         }
     }
