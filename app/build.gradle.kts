@@ -99,21 +99,36 @@ if (localPropsFile.exists()) {
 val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
 
 if (!deployDir.isNullOrBlank()) {
-    val copyApkToDeployDir = tasks.register<Copy>("copyApkToDeployDir") {
+    val copyDebugApkToDeployDir = tasks.register<Copy>("copyDebugApkToDeployDir") {
         val apkFolder = layout.buildDirectory.dir("outputs/apk/debug")
-        from(apkFolder) {
-            include("app-debug.apk")
-            rename("app-debug.apk", "LYWSD02_BLE_Tool.apk")
-        }
         from(apkFolder) {
             include("app-debug.apk")
         }
         into(file(deployDir))
     }
 
+    val copyReleaseApkToDeployDir = tasks.register<Copy>("copyReleaseApkToDeployDir") {
+        val apkFolder = layout.buildDirectory.dir("outputs/apk/release")
+        from(apkFolder) {
+            include("app-release.apk")
+            rename("app-release.apk", "LYWSD02_BLE_Tool.apk")
+        }
+        from(apkFolder) {
+            include("app-release.apk")
+            rename("app-release.apk", "LYWSD02_BLE_Tool_v1.2.0.apk")
+        }
+        from(apkFolder) {
+            include("app-release.apk")
+        }
+        into(file(deployDir))
+    }
+
     afterEvaluate {
         tasks.named("assembleDebug").configure {
-            finalizedBy(copyApkToDeployDir)
+            finalizedBy(copyDebugApkToDeployDir)
+        }
+        tasks.named("assembleRelease").configure {
+            finalizedBy(copyReleaseApkToDeployDir)
         }
     }
 }
