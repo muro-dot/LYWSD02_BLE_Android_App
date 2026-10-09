@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -19,6 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
@@ -162,17 +166,35 @@ fun MainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "LYWSD02 BLE Dashboard · v1.2.0",
+                    text = "LYWSD02 BLE Dashboard · v1.2.1",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = InkMuted
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "출시일자: 2026. 10. 09",
                     fontSize = 11.sp,
                     color = InkMuted.copy(alpha = 0.8f)
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                androidx.compose.material3.TextButton(
+                    onClick = { viewModel.checkForUpdates(isManual = true) }
+                ) {
+                    androidx.compose.material3.Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Refresh,
+                        contentDescription = "업데이트 확인",
+                        tint = com.example.lywsd02bledashboard.theme.TealPrimary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "업데이트 확인",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = com.example.lywsd02bledashboard.theme.TealPrimary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

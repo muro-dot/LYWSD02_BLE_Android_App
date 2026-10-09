@@ -472,19 +472,31 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     /**
      * 깃허브 최신 릴리즈를 비동기로 조회하여 업데이트 존재 시 알림을 띄웁니다.
+     * @param isManual 사용자가 직접 버튼을 눌러 수동 조회를 요청했는지 여부
      */
-    fun checkForUpdates() {
+    fun checkForUpdates(isManual: Boolean = false) {
         viewModelScope.launch {
+            if (isManual) {
+                addLog("최신 릴리즈 버전을 확인하고 있습니다...", LogType.INFO)
+            }
             val updateInfo = UpdateChecker.checkLatestRelease(getApplication())
-            if (updateInfo != null && updateInfo.hasUpdate) {
-                _uiState.update {
-                    it.copy(
-                        appUpdateInfo = updateInfo,
-                        isUpdateDialogOpen = true,
-                        updateDownloadState = UpdateDownloadState.Idle
-                    )
+            if (updateInfo != null) {
+                if (updateInfo.hasUpdate) {
+                    _uiState.update {
+                        it.copy(
+                            appUpdateInfo = updateInfo,
+                            isUpdateDialogOpen = true,
+                            updateDownloadState = UpdateDownloadState.Idle
+                        )
+                    }
+                    addLog("새로운 릴리즈(v${updateInfo.latestVersion})가 발견되었습니다! 업데이트 팝업을 표시합니다.", LogType.INFO)
+                } else {
+                    addLog("현재 최신 버전(v${updateInfo.currentVersion})을 사용하고 있습니다.", LogType.SUCCESS)
                 }
-                addLog("새로운 릴리즈(v${updateInfo.latestVersion})가 발견되었습니다! 업데이트 팝업을 표시합니다.", LogType.INFO)
+            } else {
+                if (isManual) {
+                    addLog("최신 릴리즈 정보를 확인할 수 없습니다. (네트워크 연결 상태 또는 GitHub API 호출 제한 확인)", LogType.WARNING)
+                }
             }
         }
     }
