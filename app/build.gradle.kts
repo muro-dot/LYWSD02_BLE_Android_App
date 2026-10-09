@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.lywsd02bledashboard"
         minSdk = 24
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.2.5"
+        versionCode = 10
+        versionName = "1.2.6"
     }
 
     buildTypes {
@@ -99,7 +99,7 @@ if (localPropsFile.exists()) {
 val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
 
 if (!deployDir.isNullOrBlank()) {
-    val currentVersion = android.defaultConfig.versionName ?: "1.2.5"
+    val currentVersion = android.defaultConfig.versionName ?: "1.2.6"
 
     val copyDebugApkToDeployDir = tasks.register<Copy>("copyDebugApkToDeployDir") {
         val apkFolder = layout.buildDirectory.dir("outputs/apk/debug")
