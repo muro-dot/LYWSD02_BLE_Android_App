@@ -64,7 +64,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     init {
         observeBleEvents()
-        addLog("LYWSD02 BLE 대시보드가 준비되었습니다. 블루투스를 켜고 기기를 검색하세요.", LogType.INFO)
+        addLog(
+            messageKo = "LYWSD02 BLE 대시보드가 준비되었습니다. 블루투스를 켜고 기기를 검색하세요.",
+            messageEn = "LYWSD02 BLE Dashboard ready. Turn on Bluetooth and scan for devices.",
+            type = LogType.INFO
+        )
         checkForUpdates()
     }
 
@@ -94,10 +98,10 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
 
-        // 3. 로그 관찰
+        // 3. 로그 관찰 (다국어 LogEntry 직접 수신)
         viewModelScope.launch {
-            bleManager.logFlow.collect { (msg, type) ->
-                addLog(msg, type)
+            bleManager.logFlow.collect { entry ->
+                addLog(entry)
             }
         }
 
@@ -213,7 +217,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             // 4. 자동 시간 동기화 (드리프트가 10초 이상이고 자동 보정 옵션이 켜져 있을 때)
             if (_uiState.value.isAutoSyncClockEnabled && timeResult != null) {
                 if (Math.abs(timeResult.driftSeconds) > 10) {
-                    addLog("시간 오차가 ${Math.abs(timeResult.driftSeconds)}초 감지되어 시계를 자동으로 동기화합니다.", LogType.INFO)
+                    addLog(
+                        messageKo = "시간 오차가 ${Math.abs(timeResult.driftSeconds)}초 감지되어 시계를 자동으로 동기화합니다.",
+                        messageEn = "Clock drift of ${Math.abs(timeResult.driftSeconds)}s detected. Synchronizing clock automatically...",
+                        type = LogType.INFO
+                    )
                     syncClock(isAutomatic = true)
                 }
             }
@@ -370,7 +378,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                 isUsingSystemTimezone = true
             )
         }
-        addLog("스마트폰 시스템 타임존(${BleProtocolParser.formatTimezoneOffset(systemOffset)})으로 설정되었습니다.", LogType.INFO)
+        addLog(
+            messageKo = "스마트폰 시스템 타임존(${BleProtocolParser.formatTimezoneOffset(systemOffset)})으로 설정되었습니다.",
+            messageEn = "Set to smartphone system timezone (${BleProtocolParser.formatTimezoneOffset(systemOffset)}).",
+            type = LogType.INFO
+        )
         if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
             refreshClock()
         }
@@ -466,11 +478,19 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "과거 기록 CSV 내보내기"))
-                    addLog("과거 기록 CSV 내보내기 파일이 생성되었습니다: $fileName", LogType.SUCCESS)
+                    addLog(
+                        messageKo = "과거 기록 CSV 내보내기 파일이 생성되었습니다: $fileName",
+                        messageEn = "History CSV export file created: $fileName",
+                        type = LogType.SUCCESS
+                    )
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    addLog("CSV 내보내기 실패: ${e.message}", LogType.ERROR)
+                    addLog(
+                        messageKo = "CSV 내보내기 실패: ${e.message}",
+                        messageEn = "CSV export failed: ${e.message}",
+                        type = LogType.ERROR
+                    )
                 }
             }
         }
@@ -494,13 +514,21 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                 knownDevices = repository.getKnownDevices()
             )
         }
-        addLog("기기 별칭이 '${alias.trim()}'(으)로 저장되었습니다.", LogType.SUCCESS)
+        addLog(
+            messageKo = "기기 별칭이 '${alias.trim()}'(으)로 저장되었습니다.",
+            messageEn = "Device alias saved as '${alias.trim()}'.",
+            type = LogType.SUCCESS
+        )
     }
 
     fun removeKnownDevice(id: String) {
         repository.removeKnownDevice(id)
         _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
-        addLog("저장된 기기 기록이 삭제되었습니다.", LogType.INFO)
+        addLog(
+            messageKo = "저장된 기기 기록이 삭제되었습니다.",
+            messageEn = "Saved device record deleted.",
+            type = LogType.INFO
+        )
     }
 
     fun clearLogs() {
@@ -514,7 +542,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun checkForUpdates(isManual: Boolean = false) {
         viewModelScope.launch {
             if (isManual) {
-                addLog("최신 릴리즈 버전을 확인하고 있습니다...", LogType.INFO)
+                addLog(
+                    messageKo = "최신 릴리즈 버전을 확인하고 있습니다...",
+                    messageEn = "Checking for latest release updates...",
+                    type = LogType.INFO
+                )
             }
             val updateInfo = UpdateChecker.checkLatestRelease(getApplication())
             if (updateInfo != null) {
@@ -526,13 +558,25 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                             updateDownloadState = UpdateDownloadState.Idle
                         )
                     }
-                    addLog("새로운 릴리즈(v${updateInfo.latestVersion})가 발견되었습니다! 업데이트 팝업을 표시합니다.", LogType.INFO)
+                    addLog(
+                        messageKo = "새로운 릴리즈(v${updateInfo.latestVersion})가 발견되었습니다! 업데이트 팝업을 표시합니다.",
+                        messageEn = "New release (v${updateInfo.latestVersion}) available! Showing update dialog.",
+                        type = LogType.INFO
+                    )
                 } else {
-                    addLog("현재 최신 버전(v${updateInfo.currentVersion})을 사용하고 있습니다.", LogType.SUCCESS)
+                    addLog(
+                        messageKo = "현재 최신 버전(v${updateInfo.currentVersion})을 사용하고 있습니다.",
+                        messageEn = "You are using the latest version (v${updateInfo.currentVersion}).",
+                        type = LogType.SUCCESS
+                    )
                 }
             } else {
                 if (isManual) {
-                    addLog("최신 릴리즈 정보를 확인할 수 없습니다. (네트워크 연결 상태 또는 GitHub API 호출 제한 확인)", LogType.WARNING)
+                    addLog(
+                        messageKo = "최신 릴리즈 정보를 확인할 수 없습니다. (네트워크 연결 상태 또는 GitHub API 호출 제한 확인)",
+                        messageEn = "Failed to check release info. (Check network or GitHub API rate limits)",
+                        type = LogType.WARNING
+                    )
                 }
             }
         }
@@ -554,7 +598,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             _uiState.update {
                 it.copy(updateDownloadState = UpdateDownloadState.Downloading(0))
             }
-            addLog("최신 릴리즈 APK 다운로드를 시작합니다...", LogType.INFO)
+            addLog(
+                messageKo = "최신 릴리즈 APK 다운로드를 시작합니다...",
+                messageEn = "Starting download of the latest APK release...",
+                type = LogType.INFO
+            )
 
             val result = UpdateInstaller.downloadApk(
                 context = getApplication(),
@@ -571,7 +619,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                     _uiState.update {
                         it.copy(updateDownloadState = UpdateDownloadState.DownloadCompleted(file.absolutePath))
                     }
-                    addLog("APK 다운로드 완료. 패키지 설치 화면을 호출합니다.", LogType.SUCCESS)
+                    addLog(
+                        messageKo = "APK 다운로드 완료. 패키지 설치 화면을 호출합니다.",
+                        messageEn = "APK download completed. Prompting package installer...",
+                        type = LogType.SUCCESS
+                    )
                     installAppUpdate(file)
                 },
                 onFailure = { error ->
@@ -579,7 +631,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                     _uiState.update {
                         it.copy(updateDownloadState = UpdateDownloadState.Error(errorMsg))
                     }
-                    addLog("업데이트 다운로드 실패: $errorMsg", LogType.ERROR)
+                    addLog(
+                        messageKo = "업데이트 다운로드 실패: $errorMsg",
+                        messageEn = "Update download failed: $errorMsg",
+                        type = LogType.ERROR
+                    )
                 }
             )
         }
@@ -607,7 +663,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             _uiState.update {
                 it.copy(updateDownloadState = UpdateDownloadState.Error(msg))
             }
-            addLog("앱 설치 실패: $msg", LogType.ERROR)
+            addLog(
+                messageKo = "앱 설치 실패: $msg",
+                messageEn = "App installation failed: $msg",
+                type = LogType.ERROR
+            )
         }
     }
 
@@ -615,11 +675,18 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.update { it.copy(isUpdateDialogOpen = false) }
     }
 
+    private fun addLog(messageKo: String, messageEn: String = messageKo, type: LogType) {
+        addLog(LogEntry(messageKo = messageKo, messageEn = messageEn, type = type))
+    }
+
     private fun addLog(message: String, type: LogType) {
-        val newEntry = LogEntry(message = message, type = type)
+        addLog(messageKo = message, messageEn = message, type = type)
+    }
+
+    private fun addLog(entry: LogEntry) {
         _uiState.update {
             val updated = it.logs.toMutableList()
-            updated.add(newEntry)
+            updated.add(entry)
             if (updated.size > 120) {
                 updated.removeAt(0)
             }

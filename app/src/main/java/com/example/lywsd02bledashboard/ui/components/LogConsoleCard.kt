@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +63,7 @@ fun LogConsoleCard(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
+    val isKorean = booleanResource(R.bool.is_korean_locale)
 
     // 새 로그 추가 시 맨 아래로 자동 스크롤
     LaunchedEffect(logs.size) {
@@ -207,7 +209,7 @@ fun LogConsoleCard(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = log.message,
+                                    text = log.getMessage(isKorean),
                                     color = InkPrimary,
                                     fontSize = 12.sp,
                                     fontFamily = FontFamily.Monospace,

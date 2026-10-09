@@ -252,15 +252,23 @@ object BleProtocolParser {
     }
 
     /**
-     * 오차(초) 텍스트 변환 ("동기화됨", "+X초 빠름", "-X초 느림")
+     * 오차(초) 텍스트 변환 (다국어 지원)
      */
-    fun formatDriftText(driftSeconds: Long?): String {
-        if (driftSeconds == null) return "알 수 없음"
+    fun formatDriftText(driftSeconds: Long?, isKorean: Boolean = Locale.getDefault().language == "ko"): String {
+        if (driftSeconds == null) return if (isKorean) "알 수 없음" else "Unknown"
         val absSeconds = Math.abs(driftSeconds)
-        return when {
-            absSeconds <= 1 -> "동기화됨 (오차 1초 이내)"
-            driftSeconds > 0 -> "+${absSeconds}초 빠름"
-            else -> "-${absSeconds}초 느림"
+        return if (isKorean) {
+            when {
+                absSeconds <= 1 -> "동기화됨 (오차 1초 이내)"
+                driftSeconds > 0 -> "+${absSeconds}초 빠름"
+                else -> "-${absSeconds}초 느림"
+            }
+        } else {
+            when {
+                absSeconds <= 1 -> "In Sync (within 1s)"
+                driftSeconds > 0 -> "+${absSeconds}s fast"
+                else -> "-${absSeconds}s slow"
+            }
         }
     }
 }

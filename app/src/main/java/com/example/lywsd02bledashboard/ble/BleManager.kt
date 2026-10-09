@@ -22,6 +22,7 @@ import com.example.lywsd02bledashboard.model.BleConstants
 import com.example.lywsd02bledashboard.model.ClockDisplayMode
 import com.example.lywsd02bledashboard.model.ConnectionState
 import com.example.lywsd02bledashboard.model.HistoryRecord
+import com.example.lywsd02bledashboard.model.LogEntry
 import com.example.lywsd02bledashboard.model.LogType
 import com.example.lywsd02bledashboard.model.ScannedDeviceInfo
 import com.example.lywsd02bledashboard.model.TemperatureUnit
@@ -65,9 +66,9 @@ class BleManager(
     private val _scannedDevices = MutableStateFlow<List<ScannedDeviceInfo>>(emptyList())
     val scannedDevices: StateFlow<List<ScannedDeviceInfo>> = _scannedDevices.asStateFlow()
 
-    // 로그 이벤트 방출
-    private val _logFlow = MutableSharedFlow<Pair<String, LogType>>(extraBufferCapacity = 64)
-    val logFlow: SharedFlow<Pair<String, LogType>> = _logFlow.asSharedFlow()
+    // 로그 이벤트 방출 (다국어 지원 LogEntry)
+    private val _logFlow = MutableSharedFlow<LogEntry>(extraBufferCapacity = 64)
+    val logFlow: SharedFlow<LogEntry> = _logFlow.asSharedFlow()
 
     // 센서 측정값 방출 (온도, 습도)
     private val _measurementFlow = MutableSharedFlow<Pair<Float, Int>>(extraBufferCapacity = 16)
@@ -125,7 +126,11 @@ class BleManager(
         }
 
         override fun onScanFailed(errorCode: Int) {
-            emitLog("BLE 스캔 실패 (코드: $errorCode)", LogType.ERROR)
+            emitLog(
+                messageKo = "BLE 스캔 실패 (코드: $errorCode)",
+                messageEn = "BLE scan failed (code: $errorCode)",
+                type = LogType.ERROR
+            )
             _connectionState.value = ConnectionState.DISCONNECTED
         }
     }
@@ -186,7 +191,11 @@ class BleManager(
         @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                emitLog("기기 연결 성공. 서비스 검색을 시작합니다...", LogType.SUCCESS)
+                emitLog(
+                    messageKo = "기기 연결 성공. 서비스 검색을 시작합니다...",
+                    messageEn = "Device connected successfully. Discovering services...",
+                    type = LogType.SUCCESS
+                )
                 _connectionState.value = ConnectionState.CONNECTING
                 retryAttempt = 0
                 // 안정적인 서비스 검색을 위해 약간의 지연 후 호출
@@ -194,7 +203,11 @@ class BleManager(
                     gatt.discoverServices()
                 }, 300)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                emitLog("GATT 연결이 해제되었습니다. (상태 코드: $status)", LogType.WARNING)
+                emitLog(
+                    messageKo = "GATT 연결이 해제되었습니다. (상태 코드: $status)",
+                    messageEn = "GATT disconnected (status code: $status)",
+                    type = LogType.WARNING
+                )
                 cleanUpGatt()
 
                 if (!isManualDisconnect && currentTargetAddress != null) {
@@ -210,7 +223,11 @@ class BleManager(
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 mainService = gatt.getService(BleConstants.SERVICE_UUID)
                 if (mainService != null) {
-                    emitLog("LYWSD02 메인 서비스 발견 완료!", LogType.SUCCESS)
+                    emitLog(
+                        messageKo = "LYWSD02 메인 서비스 발견 완료!",
+                        messageEn = "LYWSD02 main service discovered!",
+                        type = LogType.SUCCESS
+                    )
                     _connectionState.value = ConnectionState.CONNECTED
 
                     // 기기 연결 시 5분 후 자동 연결 해제 스케줄링 (배터리 절약)
@@ -218,7 +235,11 @@ class BleManager(
                     autoDisconnectJob = scope.launch {
                         delay(5 * 60 * 1000L) // 5분
                         if (_connectionState.value == ConnectionState.CONNECTED) {
-                            emitLog("연결 유지 시간(5분)이 경과하여 배터리 절약을 위해 기기 연결을 자동으로 해제합니다.", LogType.INFO)
+                            emitLog(
+                                messageKo = "연결 유지 시간(5분)이 경과하여 배터리 절약을 위해 기기 연결을 자동으로 해제합니다.",
+                                messageEn = "Device connection automatically closed after 5 minutes to conserve battery.",
+                                type = LogType.INFO
+                            )
                             disconnect()
                         }
                     }
@@ -228,11 +249,19 @@ class BleManager(
                         enableMeasurementsNotification()
                     }
                 } else {
-                    emitLog("LYWSD02 필수 서비스를 찾을 수 없습니다.", LogType.ERROR)
+                    emitLog(
+                        messageKo = "LYWSD02 필수 서비스를 찾을 수 없습니다.",
+                        messageEn = "LYWSD02 required service not found.",
+                        type = LogType.ERROR
+                    )
                     disconnect()
                 }
             } else {
-                emitLog("서비스 검색 실패 (상태: $status)", LogType.ERROR)
+                emitLog(
+                    messageKo = "서비스 검색 실패 (상태: $status)",
+                    messageEn = "Service discovery failed (status: $status)",
+                    type = LogType.ERROR
+                )
                 disconnect()
             }
         }
@@ -322,13 +351,21 @@ class BleManager(
     @SuppressLint("MissingPermission")
     fun startScan() {
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled) {
-            emitLog("블루투스가 꺼져 있습니다. 활성화해주세요.", LogType.ERROR)
+            emitLog(
+                messageKo = "블루투스가 꺼져 있습니다. 활성화해주세요.",
+                messageEn = "Bluetooth is turned off. Please enable it.",
+                type = LogType.ERROR
+            )
             return
         }
 
         val scanner = bluetoothAdapter.bluetoothLeScanner
         if (scanner == null) {
-            emitLog("BLE 스캐너를 초기화할 수 없습니다.", LogType.ERROR)
+            emitLog(
+                messageKo = "BLE 스캐너를 초기화할 수 없습니다.",
+                messageEn = "Failed to initialize BLE scanner.",
+                type = LogType.ERROR
+            )
             return
         }
 
@@ -336,7 +373,11 @@ class BleManager(
         scannedDevicesMap.clear()
         _scannedDevices.value = emptyList()
         _connectionState.value = ConnectionState.SCANNING
-        emitLog("주변 BLE 기기 검색을 시작합니다... (LYWSD02 우선 정렬)", LogType.INFO)
+        emitLog(
+            messageKo = "주변 BLE 기기 검색을 시작합니다... (LYWSD02 우선 정렬)",
+            messageEn = "Scanning for nearby BLE devices... (LYWSD02 prioritized)",
+            type = LogType.INFO
+        )
 
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -348,7 +389,11 @@ class BleManager(
         try {
             scanner.startScan(null, settings, scanCallback)
         } catch (e: Exception) {
-            emitLog("BLE 스캔 시작 중 오류 발생: ${e.message}", LogType.ERROR)
+            emitLog(
+                messageKo = "BLE 스캔 시작 중 오류 발생: ${e.message}",
+                messageEn = "Error starting BLE scan: ${e.message}",
+                type = LogType.ERROR
+            )
             _connectionState.value = ConnectionState.DISCONNECTED
             return
         }
@@ -371,7 +416,11 @@ class BleManager(
                 // 무시
             }
             _connectionState.value = ConnectionState.DISCONNECTED
-            emitLog("기기 검색이 종료되었습니다.", LogType.INFO)
+            emitLog(
+                messageKo = "기기 검색이 종료되었습니다.",
+                messageEn = "Device scanning finished.",
+                type = LogType.INFO
+            )
         }
     }
 
@@ -389,11 +438,19 @@ class BleManager(
         retryAttempt = 0
 
         _connectionState.value = ConnectionState.CONNECTING
-        emitLog("$name ($address) 에 연결을 시도합니다...", LogType.INFO)
+        emitLog(
+            messageKo = "$name ($address) 에 연결을 시도합니다...",
+            messageEn = "Connecting to $name ($address)...",
+            type = LogType.INFO
+        )
 
         val device = bluetoothAdapter?.getRemoteDevice(address)
         if (device == null) {
-            emitLog("해당 주소의 블루투스 장치를 찾을 수 없습니다.", LogType.ERROR)
+            emitLog(
+                messageKo = "해당 주소의 블루투스 장치를 찾을 수 없습니다.",
+                messageEn = "Bluetooth device not found at specified address.",
+                type = LogType.ERROR
+            )
             _connectionState.value = ConnectionState.DISCONNECTED
             return
         }
@@ -417,7 +474,11 @@ class BleManager(
         autoRetryJob?.cancel()
         autoDisconnectJob?.cancel()
         _connectionState.value = ConnectionState.DISCONNECTED
-        emitLog("연결을 수동으로 해제합니다.", LogType.INFO)
+        emitLog(
+            messageKo = "연결을 수동으로 해제합니다.",
+            messageEn = "Disconnecting device manually.",
+            type = LogType.INFO
+        )
 
         cleanUpGatt()
     }
@@ -442,7 +503,11 @@ class BleManager(
      */
     private fun scheduleAutoReconnect() {
         if (retryAttempt >= BleConstants.RETRY_DELAYS_MS.size) {
-            emitLog("최대 재시도 횟수 초과로 재연결을 중단합니다.", LogType.ERROR)
+            emitLog(
+                messageKo = "최대 재시도 횟수 초과로 재연결을 중단합니다.",
+                messageEn = "Max retry attempts exceeded. Aborting reconnection.",
+                type = LogType.ERROR
+            )
             _connectionState.value = ConnectionState.DISCONNECTED
             return
         }
@@ -450,7 +515,11 @@ class BleManager(
         val delayMs = BleConstants.RETRY_DELAYS_MS[retryAttempt]
         retryAttempt++
         _connectionState.value = ConnectionState.CONNECTING
-        emitLog("${delayMs / 1000}초 후 재연결을 시도합니다... (시도 $retryAttempt/${BleConstants.RETRY_DELAYS_MS.size})", LogType.WARNING)
+        emitLog(
+            messageKo = "${delayMs / 1000}초 후 재연결을 시도합니다... (시도 $retryAttempt/${BleConstants.RETRY_DELAYS_MS.size})",
+            messageEn = "Retrying connection in ${delayMs / 1000}s... (Attempt $retryAttempt/${BleConstants.RETRY_DELAYS_MS.size})",
+            type = LogType.WARNING
+        )
 
         autoRetryJob?.cancel()
         autoRetryJob = scope.launch {
@@ -493,7 +562,11 @@ class BleManager(
 
             val result = withTimeoutOrNull(3000) { deferred.await() } ?: false
             if (result) {
-                emitLog("실시간 측정값 스트리밍 수신이 시작되었습니다.", LogType.SUCCESS)
+                emitLog(
+                    messageKo = "실시간 측정값 스트리밍 수신이 시작되었습니다.",
+                    messageEn = "Real-time measurement streaming started.",
+                    type = LogType.SUCCESS
+                )
             }
             return result
         }
@@ -561,7 +634,11 @@ class BleManager(
         val level = BleProtocolParser.parseBattery(bytes)
         if (level != null) {
             _batteryFlow.tryEmit(level)
-            emitLog("배터리 잔량 확인: $level%", LogType.INFO)
+            emitLog(
+                messageKo = "배터리 잔량 확인: $level%",
+                messageEn = "Battery level: $level%",
+                type = LogType.INFO
+            )
         }
         return level
     }
@@ -573,7 +650,11 @@ class BleManager(
         val bytes = readCharacteristicBytes(BleConstants.UNIT_CHARACTERISTIC_UUID) ?: return null
         val unit = BleProtocolParser.parseUnit(bytes)
         _unitFlow.tryEmit(unit)
-        emitLog("기기 온도 단위 확인: ${if (unit == TemperatureUnit.FAHRENHEIT) "°F (화씨)" else "°C (섭씨)"}", LogType.INFO)
+        emitLog(
+            messageKo = "기기 온도 단위 확인: ${if (unit == TemperatureUnit.FAHRENHEIT) "°F (화씨)" else "°C (섭씨)"}",
+            messageEn = "Device temperature unit: ${if (unit == TemperatureUnit.FAHRENHEIT) "°F (Fahrenheit)" else "°C (Celsius)"}",
+            type = LogType.INFO
+        )
         return unit
     }
 
@@ -585,9 +666,17 @@ class BleManager(
         val success = writeCharacteristicBytes(BleConstants.UNIT_CHARACTERISTIC_UUID, payload)
         if (success) {
             _unitFlow.tryEmit(unit)
-            emitLog("기기 온도 단위 변경 완료: ${if (unit == TemperatureUnit.FAHRENHEIT) "°F" else "°C"}", LogType.SUCCESS)
+            emitLog(
+                messageKo = "기기 온도 단위 변경 완료: ${if (unit == TemperatureUnit.FAHRENHEIT) "°F" else "°C"}",
+                messageEn = "Temperature unit changed to ${if (unit == TemperatureUnit.FAHRENHEIT) "°F" else "°C"}",
+                type = LogType.SUCCESS
+            )
         } else {
-            emitLog("온도 단위 변경 실패", LogType.ERROR)
+            emitLog(
+                messageKo = "온도 단위 변경 실패",
+                messageEn = "Failed to change temperature unit",
+                type = LogType.ERROR
+            )
         }
         return success
     }
@@ -600,7 +689,11 @@ class BleManager(
         val result = BleProtocolParser.parseTime(bytes, desiredOffsetMinutes, isTwelveHour)
         if (result != null) {
             _timeFlow.tryEmit(result)
-            emitLog("기기 시계 읽기 성공: ${result.formattedTime} (${BleProtocolParser.formatDriftText(result.driftSeconds)})", LogType.SUCCESS)
+            emitLog(
+                messageKo = "기기 시계 읽기 성공: ${result.formattedTime} (${BleProtocolParser.formatDriftText(result.driftSeconds, isKorean = true)})",
+                messageEn = "Device clock read successfully: ${result.formattedTime} (${BleProtocolParser.formatDriftText(result.driftSeconds, isKorean = false)})",
+                type = LogType.SUCCESS
+            )
         }
         return result
     }
@@ -617,7 +710,11 @@ class BleManager(
         val payload = BleProtocolParser.encodeTimeSync(desiredOffsetMinutes, manualOffsetMinutes, automatic)
         val success = writeCharacteristicBytes(BleConstants.TIME_CHARACTERISTIC_UUID, payload)
         if (!success) {
-            emitLog("시간 동기화 쓰기 실패", LogType.ERROR)
+            emitLog(
+                messageKo = "시간 동기화 쓰기 실패",
+                messageEn = "Failed to write time synchronization",
+                type = LogType.ERROR
+            )
             return false
         }
 
@@ -629,7 +726,11 @@ class BleManager(
             // 구형 LYWSD02는 지원하지 않을 수 있음
         }
 
-        emitLog("시계 동기화 완료! (${BleProtocolParser.formatTimezoneOffset(desiredOffsetMinutes)})", LogType.SUCCESS)
+        emitLog(
+            messageKo = "시계 동기화 완료! (${BleProtocolParser.formatTimezoneOffset(desiredOffsetMinutes)})",
+            messageEn = "Clock synchronized successfully! (${BleProtocolParser.formatTimezoneOffset(desiredOffsetMinutes)})",
+            type = LogType.SUCCESS
+        )
         delay(250)
         readTime(desiredOffsetMinutes, clockMode == ClockDisplayMode.MODE_12H)
         return true
@@ -643,10 +744,18 @@ class BleManager(
         val success = writeCharacteristicBytes(BleConstants.TIME_CHARACTERISTIC_UUID, payload)
         val modeLabel = if (mode == ClockDisplayMode.MODE_12H) "12시간" else "24시간"
         if (success) {
-            emitLog("기기 시계 표시 형식을 ${modeLabel} 모드로 설정했습니다.", LogType.INFO)
+            emitLog(
+                messageKo = "기기 시계 표시 형식을 ${modeLabel} 모드로 설정했습니다.",
+                messageEn = "Clock display format set to ${if (mode == ClockDisplayMode.MODE_12H) "12-hour" else "24-hour"} mode.",
+                type = LogType.INFO
+            )
         } else {
             // 구형 기기(5바이트 프로토콜)의 경우 7바이트 쓰기를 거부할 수 있음
-            emitLog("기기 시계 표시 형식(${modeLabel}) 쓰기 미지원 또는 무시됨 (구형 펌웨어)", LogType.INFO)
+            emitLog(
+                messageKo = "기기 시계 표시 형식(${modeLabel}) 쓰기 미지원 또는 무시됨 (구형 펌웨어)",
+                messageEn = "Clock display format (${if (mode == ClockDisplayMode.MODE_12H) "12h" else "24h"}) write not supported or ignored (legacy firmware)",
+                type = LogType.INFO
+            )
         }
         return success
     }
@@ -661,31 +770,51 @@ class BleManager(
         // 1. 레코드 개수 읽기
         val countBytes = readCharacteristicBytes(BleConstants.RECORD_COUNT_CHARACTERISTIC_UUID)
             ?: run {
-                emitLog("히스토리 개수 조회 실패", LogType.ERROR)
+                emitLog(
+                    messageKo = "히스토리 개수 조회 실패",
+                    messageEn = "Failed to query history count",
+                    type = LogType.ERROR
+                )
                 return emptyList()
             }
 
         val (totalRecords, storedRecords) = BleProtocolParser.parseRecordCount(countBytes)
             ?: run {
-                emitLog("히스토리 개수 파싱 실패", LogType.ERROR)
+                emitLog(
+                    messageKo = "히스토리 개수 파싱 실패",
+                    messageEn = "Failed to parse history count",
+                    type = LogType.ERROR
+                )
                 return emptyList()
             }
 
         if (storedRecords == 0L) {
-            emitLog("기기에 저장된 과거 기록이 없습니다.", LogType.WARNING)
+            emitLog(
+                messageKo = "기기에 저장된 과거 기록이 없습니다.",
+                messageEn = "No history records stored in device.",
+                type = LogType.WARNING
+            )
             return emptyList()
         }
 
         val expectedCount = Math.min(limit.toLong(), storedRecords).toInt()
         val startIndex = Math.max(0L, totalRecords - expectedCount + 1L)
 
-        emitLog("총 $storedRecords 건 중 최근 $expectedCount 건의 과거 기록 수신을 요청합니다...", LogType.INFO)
+        emitLog(
+            messageKo = "총 $storedRecords 건 중 최근 $expectedCount 건의 과거 기록 수신을 요청합니다...",
+            messageEn = "Requesting latest $expectedCount of $storedRecords history records...",
+            type = LogType.INFO
+        )
 
         // 2. 시작 인덱스 쓰기
         val indexPayload = BleProtocolParser.encodeRecordIndex(startIndex)
         val writeIndexSuccess = writeCharacteristicBytes(BleConstants.RECORD_INDEX_CHARACTERISTIC_UUID, indexPayload)
         if (!writeIndexSuccess) {
-            emitLog("히스토리 시작 인덱스 설정 실패", LogType.ERROR)
+            emitLog(
+                messageKo = "히스토리 시작 인덱스 설정 실패",
+                messageEn = "Failed to set history start index",
+                type = LogType.ERROR
+            )
             return emptyList()
         }
 
@@ -722,7 +851,11 @@ class BleManager(
         }
 
         if (!notifyEnabled) {
-            emitLog("히스토리 스트리밍 활성화 실패", LogType.ERROR)
+            emitLog(
+                messageKo = "히스토리 스트리밍 활성화 실패",
+                messageEn = "Failed to enable history streaming",
+                type = LogType.ERROR
+            )
             return emptyList()
         }
 
@@ -766,11 +899,20 @@ class BleManager(
         }
 
         val resultList = collectedRecords.values.sortedByDescending { it.index }
-        emitLog("과거 기록 ${resultList.size}건 수신 완료!", LogType.SUCCESS)
+        emitLog(
+            messageKo = "과거 기록 ${resultList.size}건 수신 완료!",
+            messageEn = "Received ${resultList.size} history records successfully!",
+            type = LogType.SUCCESS
+        )
         return resultList
     }
 
+    private fun emitLog(messageKo: String, messageEn: String = messageKo, type: LogType) {
+        _logFlow.tryEmit(LogEntry(messageKo = messageKo, messageEn = messageEn, type = type))
+    }
+
     private fun emitLog(message: String, type: LogType) {
-        _logFlow.tryEmit(Pair(message, type))
+        emitLog(messageKo = message, messageEn = message, type = type)
     }
 }
+
