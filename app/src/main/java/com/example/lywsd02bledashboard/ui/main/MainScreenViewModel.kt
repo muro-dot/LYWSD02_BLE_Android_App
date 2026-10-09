@@ -148,12 +148,18 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         // 7. 시계 읽기 관찰
         viewModelScope.launch {
             bleManager.timeFlow.collect { timeResult ->
-                _uiState.update {
-                    it.copy(
+                _uiState.update { current ->
+                    current.copy(
                         deviceTimeFormatted = timeResult.formattedTime,
                         deviceTimezoneMinutes = timeResult.deviceTimezoneMinutes,
-                        clockDriftSeconds = timeResult.driftSeconds
+                        clockDriftSeconds = timeResult.driftSeconds,
+                        clockMode = timeResult.detectedClockMode ?: current.clockMode
                     )
+                }
+                timeResult.detectedClockMode?.let { detectedMode ->
+                    _uiState.value.connectedDeviceId?.let { deviceId ->
+                        repository.updateDeviceClockMode(deviceId, detectedMode)
+                    }
                 }
             }
         }
@@ -178,16 +184,20 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             // 1. 배터리 읽기
-            bleManager.readBattery()
+            val bat = bleManager.readBattery()
 
-            // 2. 온도 단위 읽기
-            bleManager.readUnit()
+            // 2. 온도 단위 읽기 및 기기별 저장소 갱신
+            val unit = bleManager.readUnit()
+            if (unit != null) {
+                repository.updateDeviceUnit(deviceId, unit)
+            }
 
             // 3. 기기 시계 읽기 (목표 타임존 기준으로 오차 계산)
             val timeResult = bleManager.readTime(
                 desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 isTwelveHour = _uiState.value.clockMode == ClockDisplayMode.MODE_12H
             )
+            val effectiveClockMode = timeResult?.detectedClockMode ?: _uiState.value.clockMode
 
             // 4. 자동 시간 동기화 (드리프트가 10초 이상이고 자동 보정 옵션이 켜져 있을 때)
             if (_uiState.value.isAutoSyncClockEnabled && timeResult != null) {
@@ -197,10 +207,13 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                 }
             }
 
-            // 연결 기록 갱신
+            // 연결 기록 갱신 (기기별 clockMode 및 unit 보존)
             repository.recordConnectionSuccess(
                 id = deviceId,
-                name = _uiState.value.connectedDeviceName ?: "LYWSD02"
+                name = _uiState.value.connectedDeviceName ?: "LYWSD02",
+                bat = bat,
+                clockMode = effectiveClockMode,
+                unit = unit ?: _uiState.value.selectedUnit
             )
             _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
         }
@@ -223,17 +236,17 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun connectToDevice(address: String, name: String) {
         closeScanDialog()
         val known = repository.getKnownDevices().find { it.id == address }
-        val defaultClockMode = if (name.contains("LYWSD02MMC", ignoreCase = true)) {
-            ClockDisplayMode.MODE_12H
-        } else {
-            _uiState.value.clockMode
-        }
+        // 기존 MMC 모델명 기준 12시간 강제 지정 로직을 삭제하고,
+        // 이 기기에서 이전에 사용자가 설정했던 clockMode와 단위를 복원합니다.
+        val initialClockMode = known?.clockMode ?: ClockDisplayMode.MODE_24H
+        val initialUnit = known?.lastUnit ?: repository.defaultTemperatureUnit
         _uiState.update {
             it.copy(
                 connectedDeviceId = address,
                 connectedDeviceName = name,
                 connectedDeviceAlias = known?.alias,
-                clockMode = defaultClockMode,
+                clockMode = initialClockMode,
+                selectedUnit = initialUnit,
                 temperatureCelsius = null,
                 humidityPercentage = null,
                 batteryPercentage = null,
@@ -272,18 +285,33 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun syncClock(isAutomatic: Boolean = false) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSyncingClock = true) }
-            bleManager.syncTime(
+            val mode = _uiState.value.clockMode
+            val success = bleManager.syncTime(
                 desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 manualOffsetMinutes = 0,
-                clockMode = _uiState.value.clockMode,
+                clockMode = mode,
                 automatic = isAutomatic
             )
+            if (success) {
+                _uiState.value.connectedDeviceId?.let { deviceId ->
+                    repository.updateDeviceClockMode(deviceId, mode)
+                    _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
+                }
+            }
             _uiState.update { it.copy(isSyncingClock = false) }
         }
     }
 
     fun setClockMode(mode: ClockDisplayMode) {
         _uiState.update { it.copy(clockMode = mode) }
+        val deviceId = _uiState.value.connectedDeviceId
+        if (deviceId != null) {
+            repository.updateDeviceClockMode(deviceId, mode)
+            _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
+            if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
+                refreshClock()
+            }
+        }
     }
 
     fun setTimezoneMinutes(minutes: Int) {
@@ -329,6 +357,10 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             val success = bleManager.writeUnit(unit)
             if (success) {
                 repository.defaultTemperatureUnit = unit
+                _uiState.value.connectedDeviceId?.let { deviceId ->
+                    repository.updateDeviceUnit(deviceId, unit)
+                    _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
+                }
             }
             _uiState.update { it.copy(isUpdatingUnit = false) }
         }

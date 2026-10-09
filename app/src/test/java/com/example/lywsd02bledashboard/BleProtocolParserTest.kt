@@ -5,6 +5,7 @@ import com.example.lywsd02bledashboard.model.ClockDisplayMode
 import com.example.lywsd02bledashboard.model.HistoryRecord
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -199,5 +200,70 @@ class BleProtocolParserTest {
         val offset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
         // 반환된 오프셋은 유효한 표준 타임존 목록(TIMEZONE_OFFSETS)에 포함되어야 함
         assertTrue(com.example.lywsd02bledashboard.model.BleConstants.TIMEZONE_OFFSETS.contains(offset))
+    }
+
+    @Test
+    fun testParseTime_detects12HourModeFrom7Bytes() {
+        val nowEpoch = System.currentTimeMillis() / 1000L
+        val buffer = ByteBuffer.allocate(7).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(nowEpoch.toInt())
+        buffer.put(9.toByte()) // UTC+9
+        buffer.put(0.toByte())
+        buffer.put(0xAA.toByte()) // 12H 모드 플래그
+
+        val result = BleProtocolParser.parseTime(
+            bytes = buffer.array(),
+            desiredOffsetMinutes = 540,
+            isTwelveHour = false
+        )
+
+        assertNotNull(result)
+        assertEquals(ClockDisplayMode.MODE_12H, result!!.detectedClockMode)
+        val hasMarker = result.formattedTime.contains("AM") || 
+                        result.formattedTime.contains("PM") ||
+                        result.formattedTime.contains("오전") ||
+                        result.formattedTime.contains("오후")
+        assertTrue(hasMarker)
+    }
+
+    @Test
+    fun testParseTime_detects24HourModeFrom7Bytes() {
+        val nowEpoch = System.currentTimeMillis() / 1000L
+        val buffer = ByteBuffer.allocate(7).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(nowEpoch.toInt())
+        buffer.put(9.toByte()) // UTC+9
+        buffer.put(0.toByte())
+        buffer.put(0x00.toByte()) // 24H 모드 플래그
+
+        val result = BleProtocolParser.parseTime(
+            bytes = buffer.array(),
+            desiredOffsetMinutes = 540,
+            isTwelveHour = true
+        )
+
+        assertNotNull(result)
+        assertEquals(ClockDisplayMode.MODE_24H, result!!.detectedClockMode)
+        val hasMarker = result.formattedTime.contains("AM") || 
+                        result.formattedTime.contains("PM") ||
+                        result.formattedTime.contains("오전") ||
+                        result.formattedTime.contains("오후")
+        assertFalse(hasMarker)
+    }
+
+    @Test
+    fun testParseTime_standard5BytesHasNullDetectedMode() {
+        val nowEpoch = System.currentTimeMillis() / 1000L
+        val buffer = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.putInt(nowEpoch.toInt())
+        buffer.put(9.toByte()) // UTC+9
+
+        val result = BleProtocolParser.parseTime(
+            bytes = buffer.array(),
+            desiredOffsetMinutes = 540,
+            isTwelveHour = false
+        )
+
+        assertNotNull(result)
+        assertEquals(null, result!!.detectedClockMode)
     }
 }

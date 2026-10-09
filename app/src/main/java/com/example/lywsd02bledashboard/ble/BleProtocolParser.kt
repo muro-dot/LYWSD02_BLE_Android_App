@@ -64,13 +64,14 @@ object BleProtocolParser {
     }
 
     /**
-     * 시간 데이터(4~5바이트) 파싱 및 기기 시간/오차 계산 결과
+     * 시간 데이터(4~5바이트 또는 7바이트) 파싱 및 기기 시간/오차 계산 결과
      */
     data class ParsedTimeResult(
         val localEpochSeconds: Long,
         val formattedTime: String,
         val deviceTimezoneMinutes: Int,
-        val driftSeconds: Long
+        val driftSeconds: Long,
+        val detectedClockMode: ClockDisplayMode? = null
     )
 
     /**
@@ -101,6 +102,17 @@ object BleProtocolParser {
         val timestamp = buffer.int.toLong() and 0xFFFFFFFFL
         val timezoneHours = if (bytes.size >= 5) bytes[4].toInt() else 0
 
+        // 기기 응답에 7바이트 이상 포함되어 있는 경우 12h(0xAA) / 24h(0x00) 모드 감지 (LYWSD02MMC/커스텀 펌웨어 지원)
+        val detectedClockMode = if (bytes.size >= 7) {
+            when (bytes[6].toInt() and 0xFF) {
+                0xAA -> ClockDisplayMode.MODE_12H
+                0x00 -> ClockDisplayMode.MODE_24H
+                else -> null
+            }
+        } else {
+            null
+        }
+
         // 기기 로컬 Epoch = 타임스탬프 + 타임존 시간 * 3600
         val localEpoch = timestamp + timezoneHours * 3600L
         val nowEpoch = System.currentTimeMillis() / 1000L
@@ -117,9 +129,15 @@ object BleProtocolParser {
             timezoneHours * 60
         }
 
-        // 기기 시계 표시 포맷팅 (UTC 기준으로 포맷하여 로컬 Epoch 표시)
+        // 기기 시계 표시 포맷팅 (감지된 모드가 있으면 최우선 반영)
+        val effectiveTwelveHour = if (detectedClockMode != null) {
+            detectedClockMode == ClockDisplayMode.MODE_12H
+        } else {
+            isTwelveHour
+        }
+
         val date = Date(localEpoch * 1000L)
-        val pattern = if (isTwelveHour) "hh:mm:ss a" else "HH:mm:ss"
+        val pattern = if (effectiveTwelveHour) "hh:mm:ss a" else "HH:mm:ss"
         val sdf = SimpleDateFormat(pattern, Locale.getDefault()).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
@@ -129,7 +147,8 @@ object BleProtocolParser {
             localEpochSeconds = localEpoch,
             formattedTime = formattedTime,
             deviceTimezoneMinutes = deviceTimezoneMinutes,
-            driftSeconds = drift
+            driftSeconds = drift,
+            detectedClockMode = detectedClockMode
         )
     }
 

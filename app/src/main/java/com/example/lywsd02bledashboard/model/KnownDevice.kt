@@ -15,7 +15,9 @@ data class KnownDevice(
     val connectionCount: Int = 0,
     val lastTemperatureC: Float? = null,
     val lastHumidity: Int? = null,
-    val lastBattery: Int? = null
+    val lastBattery: Int? = null,
+    val clockMode: ClockDisplayMode = ClockDisplayMode.MODE_24H,
+    val lastUnit: TemperatureUnit = TemperatureUnit.CELSIUS
 ) {
     /**
      * UI에 표시될 대표 이름 (별칭이 있으면 별칭, 없으면 기기명 + 축약 ID)

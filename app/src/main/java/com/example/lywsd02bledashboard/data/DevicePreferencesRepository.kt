@@ -3,6 +3,7 @@ package com.example.lywsd02bledashboard.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.lywsd02bledashboard.ble.BleProtocolParser
+import com.example.lywsd02bledashboard.model.ClockDisplayMode
 import com.example.lywsd02bledashboard.model.KnownDevice
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import org.json.JSONArray
@@ -36,6 +37,20 @@ class DevicePreferencesRepository(context: Context) {
             val array = JSONArray(jsonString)
             for (i in 0 until array.length()) {
                 val obj = array.getJSONObject(i)
+                val clockModeStr = obj.optString("clockMode", ClockDisplayMode.MODE_24H.name)
+                val parsedClockMode = try {
+                    ClockDisplayMode.valueOf(clockModeStr)
+                } catch (e: Exception) {
+                    ClockDisplayMode.MODE_24H
+                }
+
+                val lastUnitStr = obj.optString("lastUnit", TemperatureUnit.CELSIUS.name)
+                val parsedLastUnit = try {
+                    TemperatureUnit.valueOf(lastUnitStr)
+                } catch (e: Exception) {
+                    TemperatureUnit.CELSIUS
+                }
+
                 list.add(
                     KnownDevice(
                         id = obj.getString("id"),
@@ -45,7 +60,9 @@ class DevicePreferencesRepository(context: Context) {
                         connectionCount = obj.optInt("connectionCount", 0),
                         lastTemperatureC = if (obj.has("lastTemp")) obj.getDouble("lastTemp").toFloat() else null,
                         lastHumidity = if (obj.has("lastHumidity")) obj.getInt("lastHumidity") else null,
-                        lastBattery = if (obj.has("lastBattery")) obj.getInt("lastBattery") else null
+                        lastBattery = if (obj.has("lastBattery")) obj.getInt("lastBattery") else null,
+                        clockMode = parsedClockMode,
+                        lastUnit = parsedLastUnit
                     )
                 )
             }
@@ -71,7 +88,9 @@ class DevicePreferencesRepository(context: Context) {
         name: String = "LYWSD02",
         temp: Float? = null,
         hum: Int? = null,
-        bat: Int? = null
+        bat: Int? = null,
+        clockMode: ClockDisplayMode? = null,
+        unit: TemperatureUnit? = null
     ) {
         val currentList = getKnownDevices().toMutableList()
         val existingIndex = currentList.indexOfFirst { it.id == id }
@@ -84,7 +103,9 @@ class DevicePreferencesRepository(context: Context) {
                 connectionCount = prev.connectionCount + 1,
                 lastTemperatureC = temp ?: prev.lastTemperatureC,
                 lastHumidity = hum ?: prev.lastHumidity,
-                lastBattery = bat ?: prev.lastBattery
+                lastBattery = bat ?: prev.lastBattery,
+                clockMode = clockMode ?: prev.clockMode,
+                lastUnit = unit ?: prev.lastUnit
             )
         } else {
             KnownDevice(
@@ -95,7 +116,9 @@ class DevicePreferencesRepository(context: Context) {
                 connectionCount = 1,
                 lastTemperatureC = temp,
                 lastHumidity = hum,
-                lastBattery = bat
+                lastBattery = bat,
+                clockMode = clockMode ?: ClockDisplayMode.MODE_24H,
+                lastUnit = unit ?: TemperatureUnit.CELSIUS
             )
         }
 
@@ -121,6 +144,30 @@ class DevicePreferencesRepository(context: Context) {
     }
 
     /**
+     * 특정 기기의 시계 표시 모드 (12시간 / 24시간) 저장
+     */
+    fun updateDeviceClockMode(id: String, mode: ClockDisplayMode) {
+        val currentList = getKnownDevices().toMutableList()
+        val index = currentList.indexOfFirst { it.id == id }
+        if (index >= 0) {
+            currentList[index] = currentList[index].copy(clockMode = mode)
+            saveKnownDevices(currentList)
+        }
+    }
+
+    /**
+     * 특정 기기의 온도 단위 (°C / °F) 저장
+     */
+    fun updateDeviceUnit(id: String, unit: TemperatureUnit) {
+        val currentList = getKnownDevices().toMutableList()
+        val index = currentList.indexOfFirst { it.id == id }
+        if (index >= 0) {
+            currentList[index] = currentList[index].copy(lastUnit = unit)
+            saveKnownDevices(currentList)
+        }
+    }
+
+    /**
      * 기기 목록에서 삭제
      */
     fun removeKnownDevice(id: String) {
@@ -141,6 +188,8 @@ class DevicePreferencesRepository(context: Context) {
                     device.lastTemperatureC?.let { put("lastTemp", it.toDouble()) }
                     device.lastHumidity?.let { put("lastHumidity", it) }
                     device.lastBattery?.let { put("lastBattery", it) }
+                    put("clockMode", device.clockMode.name)
+                    put("lastUnit", device.lastUnit.name)
                 }
                 array.put(obj)
             }
