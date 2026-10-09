@@ -224,7 +224,7 @@ fun ClockSettingsCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 val textFieldValue = if (isUsingSystemTimezone) {
-                    "📱 [시스템] ${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
+                    "📱 ${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
                 } else {
                     "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
                 }

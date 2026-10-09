@@ -64,11 +64,16 @@ fun DeviceScanDialog(
 ) {
     val listState = rememberLazyListState()
 
-    // LYWSD02 기기가 새로 발견되거나 최상단에 배치될 때 목록을 최상단(0번)으로 자동 스크롤 이동
-    val lywsd02Count = remember(devices) { devices.count { it.isLywsd02 } }
-    LaunchedEffect(lywsd02Count) {
-        if (lywsd02Count > 0) {
-            listState.animateScrollToItem(0)
+    // 1순위(LYWSD02)와 2순위(기타 BLE 기기) 분리
+    val (lywsdDevices, otherDevices) = remember(devices) {
+        devices.partition { it.isLywsd02 }
+    }
+
+    // 1순위 기기가 새로 추가되거나 첫 항목이 바뀔 때 애니메이션 지연 없이 즉각 0번 인덱스로 스크롤 고정
+    val topKey = devices.firstOrNull()?.address
+    LaunchedEffect(topKey, lywsdDevices.size) {
+        if (!listState.isScrollInProgress) {
+            listState.scrollToItem(0)
         }
     }
 
@@ -156,67 +161,57 @@ fun DeviceScanDialog(
                         state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 280.dp)
+                            .heightIn(max = 290.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .background(SurfaceSoft)
                             .border(1.dp, BorderLine, RoundedCornerShape(10.dp))
                     ) {
-                        items(devices, key = { it.address }) { dev ->
-                            val isLywsd02 = dev.isLywsd02
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(if (isLywsd02) TealPrimary.copy(alpha = 0.08f) else Color.Transparent)
-                                    .clickable { onDeviceSelect(dev) }
-                                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(
-                                    modifier = Modifier.weight(1f),
-                                    verticalAlignment = Alignment.CenterVertically
+                        // 1순위: LYWSD02 기기 목록 (최상단 고정 노출)
+                        if (lywsdDevices.isNotEmpty()) {
+                            item(key = "header_lywsd") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(TealPrimary.copy(alpha = 0.15f))
+                                        .padding(horizontal = 14.dp, vertical = 6.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = if (isLywsd02) Icons.Default.Sensors else Icons.Default.Bluetooth,
-                                        contentDescription = null,
-                                        tint = if (isLywsd02) TealPrimary else InkSecondary,
-                                        modifier = Modifier.size(20.dp)
+                                    Text(
+                                        text = "⭐ 감지된 LYWSD02 센서 (${lywsdDevices.size})",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TealPrimary
                                     )
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
+                                }
+                            }
+                            items(lywsdDevices, key = { it.address }) { dev ->
+                                DeviceItemRow(dev = dev, isLywsd02 = true, onSelect = onDeviceSelect)
+                                HorizontalDivider(color = BorderLine.copy(alpha = 0.6f), thickness = 0.8.dp)
+                            }
+                        }
+
+                        // 2순위: 기타 주변 BLE 기기 목록
+                        if (otherDevices.isNotEmpty()) {
+                            if (lywsdDevices.isNotEmpty()) {
+                                item(key = "header_other") {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(BorderLine.copy(alpha = 0.3f))
+                                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                                    ) {
                                         Text(
-                                            text = dev.name,
-                                            fontSize = 14.sp,
-                                            fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
-                                            color = if (isLywsd02) TealPrimary else InkPrimary
-                                        )
-                                        Text(
-                                            text = dev.address,
+                                            text = "기타 주변 BLE 기기 (${otherDevices.size})",
                                             fontSize = 11.sp,
-                                            fontFamily = FontFamily.Monospace,
+                                            fontWeight = FontWeight.SemiBold,
                                             color = InkSecondary
                                         )
                                     }
                                 }
-
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.SignalCellularAlt,
-                                        contentDescription = "신호 세기",
-                                        tint = if (isLywsd02) TealPrimary else CyanAccent,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "${dev.rssi} dBm",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = InkPrimary,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                }
                             }
-                            HorizontalDivider(color = BorderLine.copy(alpha = 0.6f), thickness = 0.8.dp)
+                            items(otherDevices, key = { it.address }) { dev ->
+                                DeviceItemRow(dev = dev, isLywsd02 = false, onSelect = onDeviceSelect)
+                                HorizontalDivider(color = BorderLine.copy(alpha = 0.6f), thickness = 0.8.dp)
+                            }
                         }
                     }
                 }
@@ -240,4 +235,68 @@ fun DeviceScanDialog(
             }
         }
     )
+}
+
+/**
+ * 스캔된 BLE 기기 항목 행(Row) 컴포넌트
+ */
+@Composable
+private fun DeviceItemRow(
+    dev: ScannedDeviceInfo,
+    isLywsd02: Boolean,
+    onSelect: (ScannedDeviceInfo) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (isLywsd02) TealPrimary.copy(alpha = 0.08f) else Color.Transparent)
+            .clickable { onSelect(dev) }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (isLywsd02) Icons.Default.Sensors else Icons.Default.Bluetooth,
+                contentDescription = null,
+                tint = if (isLywsd02) TealPrimary else InkSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = dev.name,
+                    fontSize = 14.sp,
+                    fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
+                    color = if (isLywsd02) TealPrimary else InkPrimary
+                )
+                Text(
+                    text = dev.address,
+                    fontSize = 11.sp,
+                    fontFamily = FontFamily.Monospace,
+                    color = InkSecondary
+                )
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.SignalCellularAlt,
+                contentDescription = "신호 세기",
+                tint = if (isLywsd02) TealPrimary else CyanAccent,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${dev.rssi} dBm",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = InkPrimary,
+                fontFamily = FontFamily.Monospace
+            )
+        }
+    }
 }

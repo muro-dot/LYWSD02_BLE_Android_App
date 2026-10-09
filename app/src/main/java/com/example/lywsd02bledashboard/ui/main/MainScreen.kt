@@ -19,6 +19,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.model.ConnectionState
 import com.example.lywsd02bledashboard.theme.BackgroundPaper
 import com.example.lywsd02bledashboard.ui.components.ClockSettingsCard
@@ -150,6 +155,27 @@ fun MainScreen(
                 logs = state.logs,
                 onClearLogs = { viewModel.clearLogs() }
             )
+
+            // 8. 앱 버전 및 출시일자 푸터 정보 (맨아래칸)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "LYWSD02 BLE Dashboard · v1.2.0",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = InkMuted
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "출시일자: 2026. 10. 09",
+                    fontSize = 11.sp,
+                    color = InkMuted.copy(alpha = 0.8f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
