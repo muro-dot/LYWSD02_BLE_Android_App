@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
@@ -31,6 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,6 +62,16 @@ fun DeviceScanDialog(
     onDismiss: () -> Unit,
     onDeviceSelect: (ScannedDeviceInfo) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    // LYWSD02 기기가 새로 발견되거나 최상단에 배치될 때 목록을 최상단(0번)으로 자동 스크롤 이동
+    val lywsd02Count = remember(devices) { devices.count { it.isLywsd02 } }
+    LaunchedEffect(lywsd02Count) {
+        if (lywsd02Count > 0) {
+            listState.animateScrollToItem(0)
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = SurfaceWhite,
@@ -140,6 +153,7 @@ fun DeviceScanDialog(
                     }
                 } else {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = 280.dp)
@@ -170,30 +184,12 @@ fun DeviceScanDialog(
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = dev.name,
-                                                fontSize = 14.sp,
-                                                fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
-                                                color = if (isLywsd02) TealPrimary else InkPrimary
-                                            )
-                                            if (isLywsd02) {
-                                                Spacer(modifier = Modifier.width(6.dp))
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(4.dp))
-                                                        .background(TealPrimary)
-                                                        .padding(horizontal = 5.dp, vertical = 2.dp)
-                                                ) {
-                                                    Text(
-                                                        text = "LYWSD02",
-                                                        color = Color.White,
-                                                        fontSize = 9.sp,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                            }
-                                        }
+                                        Text(
+                                            text = dev.name,
+                                            fontSize = 14.sp,
+                                            fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
+                                            color = if (isLywsd02) TealPrimary else InkPrimary
+                                        )
                                         Text(
                                             text = dev.address,
                                             fontSize = 11.sp,
