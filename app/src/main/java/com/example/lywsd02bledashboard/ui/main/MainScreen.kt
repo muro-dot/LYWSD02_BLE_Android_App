@@ -1,8 +1,10 @@
 package com.example.lywsd02bledashboard.ui.main
 
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,23 +15,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lywsd02bledashboard.theme.InkMuted
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.ConnectionState
 import com.example.lywsd02bledashboard.theme.BackgroundPaper
+import com.example.lywsd02bledashboard.theme.InkMuted
+import com.example.lywsd02bledashboard.theme.TealPrimary
 import com.example.lywsd02bledashboard.ui.components.ClockSettingsCard
 import com.example.lywsd02bledashboard.ui.components.DeviceIdentityCard
 import com.example.lywsd02bledashboard.ui.components.DeviceRenameDialog
@@ -42,11 +52,13 @@ import com.example.lywsd02bledashboard.ui.components.LogConsoleCard
 import com.example.lywsd02bledashboard.ui.components.PermissionHandler
 import com.example.lywsd02bledashboard.ui.components.SensorMetricsGrid
 import com.example.lywsd02bledashboard.ui.components.UpdateDialog
+import java.util.Locale
 
 /**
  * LYWSD02 BLE 대시보드 메인 화면.
  * 원작 웹 대시보드(https://drslid.github.io/LYWSD02_BLE_Dashboard/)와
- * 동일한 디자인 및 센서 연동 기능을 제공합니다.
+ * 동일한 디자인 및 센서 연동 기능을 제공하며,
+ * 비한국어 단말 대응(기본 영어) 및 앱 내 실시간 언어 수동 전환을 완벽히 지원합니다.
  */
 @Composable
 fun MainScreen(
@@ -54,185 +66,220 @@ fun MainScreen(
     viewModel: MainScreenViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val scrollState = rememberScrollState()
+    val baseContext = LocalContext.current
+    val currentConfig = LocalConfiguration.current
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = BackgroundPaper,
-        topBar = {
-            HeaderSection(
-                connectionState = state.connectionState,
-                onSearchClick = { viewModel.startScan() },
-                onDisconnectClick = { viewModel.disconnect() }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundPaper)
-                .padding(innerPadding)
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // 블루투스 권한 핸들러
-            PermissionHandler(onPermissionsGranted = {})
-
-            // 1. 기기 정보 및 별칭 카드
-            DeviceIdentityCard(
-                deviceId = state.connectedDeviceId,
-                deviceName = state.connectedDeviceName,
-                deviceAlias = state.connectedDeviceAlias,
-                isConnected = state.connectionState == ConnectionState.CONNECTED,
-                onRenameClick = { viewModel.openRenameDialog() }
-            )
-
-            // 2. 실시간 센서 온습도 및 배터리 메트릭 그리드
-            SensorMetricsGrid(
-                temperatureC = state.temperatureCelsius,
-                humidity = state.humidityPercentage,
-                battery = state.batteryPercentage,
-                unit = state.selectedUnit,
-                lastMeasurementTime = state.lastMeasurementTime,
-                lastBatteryTime = state.lastBatteryTime,
-                updateCount = state.measurementCount
-            )
-
-            // 3. 기기 시계 및 시간 동기화 카드
-            ClockSettingsCard(
-                deviceTimeFormatted = state.deviceTimeFormatted,
-                deviceTimezoneMinutes = state.deviceTimezoneMinutes,
-                targetTimezoneMinutes = state.targetTimezoneMinutes,
-                isUsingSystemTimezone = state.isUsingSystemTimezone,
-                clockDriftSeconds = state.clockDriftSeconds,
-                clockMode = state.clockMode,
-                isAutoSyncEnabled = state.isAutoSyncClockEnabled,
-                isSyncing = state.isSyncingClock,
-                isConnected = state.connectionState == ConnectionState.CONNECTED,
-                onRefreshClock = { viewModel.refreshClock() },
-                onSyncClock = { viewModel.syncClock() },
-                onClockModeChange = { viewModel.setClockMode(it) },
-                onTimezoneChange = { viewModel.setTimezoneMinutes(it) },
-                onSelectSystemTimezone = { viewModel.setSystemTimezone() },
-                onAutoSyncChange = { viewModel.setAutoSyncClockEnabled(it) }
-            )
-
-            // 4. 액정 표시 온도 단위 설정 카드
-            DisplaySettingsCard(
-                currentUnit = state.selectedUnit,
-                isUpdating = state.isUpdatingUnit,
-                isConnected = state.connectionState == ConnectionState.CONNECTED,
-                onSaveUnit = { viewModel.saveUnit(it) }
-            )
-
-            // 5. 과거 온습도 기록(최대 96개) 조회 및 CSV 내보내기 카드
-            HistoryCard(
-                historyRecords = state.historyRecords,
-                historyLimit = state.historyLimit,
-                isLoading = state.isHistoryLoading,
-                statusMessage = state.historyStatusMessage,
-                unit = state.selectedUnit,
-                isConnected = state.connectionState == ConnectionState.CONNECTED,
-                onLimitChange = { viewModel.setHistoryLimit(it) },
-                onLoadHistory = { viewModel.loadHistory() },
-                onExportCsv = { viewModel.exportHistoryCsv(context) }
-            )
-
-            // 6. 최근 연결 기기 목록 (빠른 재연결) 카드
-            KnownDevicesCard(
-                knownDevices = state.knownDevices,
-                currentConnectedId = state.connectedDeviceId,
-                onDeviceClick = { dev ->
-                    viewModel.connectToDevice(dev.id, dev.name)
-                },
-                onDeleteDevice = { id ->
-                    viewModel.removeKnownDevice(id)
+    // 사용자 수동 설정 또는 시스템 언어에 따른 타겟 로케일 계산
+    val targetLocale = remember(state.appLanguage) {
+        when (state.appLanguage) {
+            "ko" -> Locale.KOREAN
+            "en" -> Locale.ENGLISH
+            else -> {
+                // 시스템 언어가 한국어가 아니면 영어 기본 리소스 적용을 위해 시스템 로케일 전달
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Resources.getSystem().configuration.locales[0]
+                } else {
+                    @Suppress("DEPRECATION")
+                    Resources.getSystem().configuration.locale
                 }
-            )
+            }
+        }
+    }
 
-            // 7. 실시간 BLE 통신 이벤트 로그 콘솔 카드
-            LogConsoleCard(
-                logs = state.logs,
-                onClearLogs = { viewModel.clearLogs() }
-            )
+    val localizedConfiguration = remember(targetLocale, currentConfig) {
+        Configuration(currentConfig).apply {
+            setLocale(targetLocale)
+        }
+    }
+    val localizedContext = remember(targetLocale, baseContext) {
+        baseContext.createConfigurationContext(localizedConfiguration)
+    }
 
-            // 8. 앱 버전 및 출시일자 푸터 정보 (맨아래칸)
+    CompositionLocalProvider(
+        LocalConfiguration provides localizedConfiguration,
+        LocalContext provides localizedContext
+    ) {
+        val scrollState = rememberScrollState()
+
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = BackgroundPaper,
+            topBar = {
+                HeaderSection(
+                    connectionState = state.connectionState,
+                    onSearchClick = { viewModel.startScan() },
+                    onDisconnectClick = { viewModel.disconnect() }
+                )
+            }
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .background(BackgroundPaper)
+                    .padding(innerPadding)
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "LYWSD02 BLE Dashboard · v1.2.1",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = InkMuted
+                // 블루투스 권한 핸들러
+                PermissionHandler(onPermissionsGranted = {})
+
+                // 1. 기기 정보 및 별칭 카드
+                DeviceIdentityCard(
+                    deviceId = state.connectedDeviceId,
+                    deviceName = state.connectedDeviceName,
+                    deviceAlias = state.connectedDeviceAlias,
+                    isConnected = state.connectionState == ConnectionState.CONNECTED,
+                    onRenameClick = { viewModel.openRenameDialog() }
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "출시일자: 2026. 10. 09",
-                    fontSize = 11.sp,
-                    color = InkMuted.copy(alpha = 0.8f)
+
+                // 2. 실시간 센서 온습도 및 배터리 메트릭 그리드
+                SensorMetricsGrid(
+                    temperatureC = state.temperatureCelsius,
+                    humidity = state.humidityPercentage,
+                    battery = state.batteryPercentage,
+                    unit = state.selectedUnit,
+                    lastMeasurementTime = state.lastMeasurementTime,
+                    lastBatteryTime = state.lastBatteryTime,
+                    updateCount = state.measurementCount
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                androidx.compose.material3.TextButton(
-                    onClick = { viewModel.checkForUpdates(isManual = true) }
+
+                // 3. 기기 시계 및 시간 동기화 카드
+                ClockSettingsCard(
+                    deviceTimeFormatted = state.deviceTimeFormatted,
+                    deviceTimezoneMinutes = state.deviceTimezoneMinutes,
+                    targetTimezoneMinutes = state.targetTimezoneMinutes,
+                    isUsingSystemTimezone = state.isUsingSystemTimezone,
+                    clockDriftSeconds = state.clockDriftSeconds,
+                    clockMode = state.clockMode,
+                    isAutoSyncEnabled = state.isAutoSyncClockEnabled,
+                    isSyncing = state.isSyncingClock,
+                    isConnected = state.connectionState == ConnectionState.CONNECTED,
+                    onRefreshClock = { viewModel.refreshClock() },
+                    onSyncClock = { viewModel.syncClock() },
+                    onClockModeChange = { viewModel.setClockMode(it) },
+                    onTimezoneChange = { viewModel.setTimezoneMinutes(it) },
+                    onSelectSystemTimezone = { viewModel.setSystemTimezone() },
+                    onAutoSyncChange = { viewModel.setAutoSyncClockEnabled(it) }
+                )
+
+                // 4. 액정 표시 온도 단위 및 앱 언어 수동 전환 설정 카드
+                DisplaySettingsCard(
+                    currentUnit = state.selectedUnit,
+                    isUpdating = state.isUpdatingUnit,
+                    isConnected = state.connectionState == ConnectionState.CONNECTED,
+                    onSaveUnit = { viewModel.saveUnit(it) },
+                    currentLanguage = state.appLanguage,
+                    onLanguageChange = { viewModel.setAppLanguage(it) }
+                )
+
+                // 5. 과거 온습도 기록(최대 96개) 조회 및 CSV 내보내기 카드
+                HistoryCard(
+                    historyRecords = state.historyRecords,
+                    historyLimit = state.historyLimit,
+                    isLoading = state.isHistoryLoading,
+                    statusMessage = state.historyStatusMessage,
+                    unit = state.selectedUnit,
+                    isConnected = state.connectionState == ConnectionState.CONNECTED,
+                    onLimitChange = { viewModel.setHistoryLimit(it) },
+                    onLoadHistory = { viewModel.loadHistory() },
+                    onExportCsv = { viewModel.exportHistoryCsv(localizedContext) }
+                )
+
+                // 6. 최근 연결 기기 목록 카드
+                KnownDevicesCard(
+                    knownDevices = state.knownDevices,
+                    currentConnectedId = state.connectedDeviceId,
+                    onDeviceClick = { dev ->
+                        viewModel.connectToDevice(dev.id, dev.name)
+                    },
+                    onDeleteDevice = { id ->
+                        viewModel.removeKnownDevice(id)
+                    }
+                )
+
+                // 7. 실시간 BLE 통신 이벤트 로그 콘솔 카드
+                LogConsoleCard(
+                    logs = state.logs,
+                    onClearLogs = { viewModel.clearLogs() }
+                )
+
+                // 8. 앱 버전 및 출시일자 푸터 정보 (v1.2.5 업데이트 반영)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    androidx.compose.material3.Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Refresh,
-                        contentDescription = "업데이트 확인",
-                        tint = com.example.lywsd02bledashboard.theme.TealPrimary,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "업데이트 확인",
+                        text = "LYWSD02 BLE Dashboard · v1.2.5",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = com.example.lywsd02bledashboard.theme.TealPrimary
+                        fontWeight = FontWeight.SemiBold,
+                        color = InkMuted
                     )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(R.string.footer_release_date),
+                        fontSize = 11.sp,
+                        color = InkMuted.copy(alpha = 0.8f)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    TextButton(
+                        onClick = { viewModel.checkForUpdates(isManual = true) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.footer_check_updates),
+                            tint = TealPrimary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.footer_check_updates),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TealPrimary
+                        )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
-    }
 
-    // 주변 센서 검색 결과 모달 다이얼로그
-    if (state.isScanDialogOpen) {
-        DeviceScanDialog(
-            devices = state.scannedDevices,
-            isScanning = state.connectionState == ConnectionState.SCANNING,
-            onDismiss = { viewModel.closeScanDialog() },
-            onRefreshScan = { viewModel.startScan() },
-            onDeviceSelect = { dev ->
-                viewModel.connectToDevice(dev.address, dev.name)
-            }
-        )
-    }
+        // 주변 센서 검색 결과 모달 다이얼로그
+        if (state.isScanDialogOpen) {
+            DeviceScanDialog(
+                devices = state.scannedDevices,
+                isScanning = state.connectionState == ConnectionState.SCANNING,
+                onDismiss = { viewModel.closeScanDialog() },
+                onRefreshScan = { viewModel.startScan() },
+                onDeviceSelect = { dev ->
+                    viewModel.connectToDevice(dev.address, dev.name)
+                }
+            )
+        }
 
-    // 별칭 수정 팝업 다이얼로그
-    if (state.isRenameDialogOpen) {
-        DeviceRenameDialog(
-            currentAlias = state.connectedDeviceAlias,
-            onDismiss = { viewModel.closeRenameDialog() },
-            onSave = { newAlias ->
-                viewModel.saveDeviceAlias(newAlias)
-            }
-        )
-    }
+        // 별칭 수정 팝업 다이얼로그
+        if (state.isRenameDialogOpen) {
+            DeviceRenameDialog(
+                currentAlias = state.connectedDeviceAlias,
+                onDismiss = { viewModel.closeRenameDialog() },
+                onSave = { newAlias ->
+                    viewModel.saveDeviceAlias(newAlias)
+                }
+            )
+        }
 
-    // 깃허브 최신 릴리즈 인앱 업데이트 팝업 다이얼로그
-    if (state.isUpdateDialogOpen && state.appUpdateInfo != null) {
-        UpdateDialog(
-            updateInfo = state.appUpdateInfo!!,
-            downloadState = state.updateDownloadState,
-            onDismiss = { viewModel.dismissUpdateDialog() },
-            onStartDownload = { viewModel.startAppUpdate() },
-            onInstall = { viewModel.installAppUpdate() }
-        )
+        // 깃허브 최신 릴리즈 인앱 업데이트 팝업 다이얼로그
+        if (state.isUpdateDialogOpen && state.appUpdateInfo != null) {
+            UpdateDialog(
+                updateInfo = state.appUpdateInfo!!,
+                downloadState = state.updateDownloadState,
+                onDismiss = { viewModel.dismissUpdateDialog() },
+                onStartDownload = { viewModel.startAppUpdate() },
+                onInstall = { viewModel.installAppUpdate() }
+            )
+        }
     }
 }

@@ -33,18 +33,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.AppUpdateInfo
 import com.example.lywsd02bledashboard.model.UpdateDownloadState
 import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
-import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.InkSecondary
-import com.example.lywsd02bledashboard.theme.StatusAmber
 import com.example.lywsd02bledashboard.theme.StatusRed
 import com.example.lywsd02bledashboard.theme.SurfaceSoft
 import com.example.lywsd02bledashboard.theme.SurfaceWhite
@@ -65,7 +65,6 @@ fun UpdateDialog(
 
     AlertDialog(
         onDismissRequest = {
-            // 다운로드 중이 아닐 때만 닫기 허용
             if (downloadState !is UpdateDownloadState.Downloading) {
                 onDismiss()
             }
@@ -96,7 +95,7 @@ fun UpdateDialog(
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(
-                        text = "새로운 업데이트 발견",
+                        text = stringResource(R.string.update_dialog_title),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary
@@ -149,7 +148,7 @@ fun UpdateDialog(
                 when (downloadState) {
                     is UpdateDownloadState.Idle -> {
                         Text(
-                            text = "지금 업데이트를 다운로드하여 최신 기능과 버그 수정사항을 적용하시겠습니까?",
+                            text = stringResource(R.string.update_dialog_prompt),
                             fontSize = 13.sp,
                             color = InkSecondary
                         )
@@ -161,7 +160,7 @@ fun UpdateDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "업데이트 APK 다운로드 중...",
+                                    text = stringResource(R.string.update_dialog_downloading),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = InkPrimary
@@ -202,7 +201,7 @@ fun UpdateDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "다운로드가 완료되었습니다. 설치를 진행하세요.",
+                                text = stringResource(R.string.update_dialog_completed),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = InkPrimary
@@ -248,11 +247,15 @@ fun UpdateDialog(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.height(36.dp)
                     ) {
-                        Text(text = "지금 업데이트", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = stringResource(R.string.update_dialog_btn_update), 
+                            fontSize = 13.sp, 
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
                 is UpdateDownloadState.Downloading -> {
-                    // 다운로드 중에는 비활성화 또는 버튼 숨김
+                    // 다운로드 중
                 }
                 is UpdateDownloadState.DownloadCompleted -> {
                     Button(
@@ -264,7 +267,11 @@ fun UpdateDialog(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.height(36.dp)
                     ) {
-                        Text(text = "지금 설치하기", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = stringResource(R.string.update_dialog_btn_install), 
+                            fontSize = 13.sp, 
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -278,8 +285,13 @@ fun UpdateDialog(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = InkPrimary),
                     modifier = Modifier.height(36.dp)
                 ) {
+                    val dismissBtnText = if (downloadState is UpdateDownloadState.DownloadCompleted) {
+                        stringResource(R.string.update_dialog_btn_later)
+                    } else {
+                        stringResource(R.string.update_dialog_btn_close)
+                    }
                     Text(
-                        text = if (downloadState is UpdateDownloadState.DownloadCompleted) "나중에" else "닫기",
+                        text = dismissBtnText,
                         color = InkPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp

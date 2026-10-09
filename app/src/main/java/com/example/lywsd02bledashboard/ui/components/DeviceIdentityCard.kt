@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,13 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lywsd02bledashboard.theme.BorderLine
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
-import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.InkSecondary
@@ -100,7 +99,7 @@ fun DeviceIdentityCard(
                         val displayTitle = when {
                             !deviceAlias.isNullOrBlank() -> deviceAlias
                             !deviceName.isNullOrBlank() -> deviceName
-                            else -> "연결된 기기 없음"
+                            else -> stringResource(R.string.device_no_connected)
                         }
                         Text(
                             text = displayTitle,
@@ -115,7 +114,7 @@ fun DeviceIdentityCard(
                             val shortId = deviceId.replace(":", "").takeLast(6).uppercase()
                             "ID · $shortId ($deviceId)"
                         } else {
-                            "기기 연결 대기 중"
+                            stringResource(R.string.device_waiting_connection)
                         }
                         Text(
                             text = idText,
@@ -128,7 +127,7 @@ fun DeviceIdentityCard(
                     }
                 }
 
-                // 별칭 변경 버튼 (충분한 최소 너비 확보, 고대비 색상 및 세로 줄바꿈 완벽 방지)
+                // 별칭 변경 버튼
                 OutlinedButton(
                     onClick = onRenameClick,
                     enabled = isConnected,
@@ -148,13 +147,13 @@ fun DeviceIdentityCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "별칭 변경",
+                        contentDescription = stringResource(R.string.device_cd_rename),
                         modifier = Modifier.size(13.dp),
                         tint = if (isConnected) TealPrimary else InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "이름변경",
+                        text = stringResource(R.string.device_btn_rename),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isConnected) TealPrimary else InkPrimary,
@@ -177,7 +176,7 @@ fun DeviceIdentityCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "MAC 주소: $deviceId",
+                        text = stringResource(R.string.device_mac_address, deviceId),
                         fontSize = 11.sp,
                         color = InkMuted,
                         fontFamily = FontFamily.Monospace
@@ -187,13 +186,13 @@ fun DeviceIdentityCard(
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             val clip = ClipData.newPlainText("MAC Address", deviceId)
                             clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "MAC 주소가 복사되었습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.device_mac_copied), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "복사",
+                            contentDescription = stringResource(R.string.device_cd_copy),
                             modifier = Modifier.size(14.dp),
                             tint = TealPrimary
                         )

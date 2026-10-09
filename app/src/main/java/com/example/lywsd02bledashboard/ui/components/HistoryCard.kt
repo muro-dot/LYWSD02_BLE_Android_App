@@ -1,7 +1,6 @@
 package com.example.lywsd02bledashboard.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
@@ -45,17 +43,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.HistoryRecord
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
-import com.example.lywsd02bledashboard.theme.CyanAccent
-import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.SurfaceSoft
@@ -116,7 +113,7 @@ fun HistoryCard(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "과거 온습도 기록",
+                            text = stringResource(R.string.history_card_title),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary,
@@ -124,7 +121,7 @@ fun HistoryCard(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "센서 내장 메모리 통계",
+                            text = stringResource(R.string.history_card_subtitle),
                             fontSize = 11.sp,
                             color = InkMuted,
                             maxLines = 1,
@@ -133,7 +130,7 @@ fun HistoryCard(
                     }
                 }
 
-                // CSV 내보내기 버튼 (세로 줄바꿈 완벽 방지 및 고대비 색상 적용)
+                // CSV 내보내기 버튼
                 OutlinedButton(
                     onClick = onExportCsv,
                     enabled = historyRecords.isNotEmpty(),
@@ -153,13 +150,13 @@ fun HistoryCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
-                        contentDescription = "CSV 내보내기",
+                        contentDescription = stringResource(R.string.history_cd_export_csv),
                         modifier = Modifier.size(13.dp),
                         tint = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "CSV 내보내기",
+                        text = stringResource(R.string.history_btn_export_csv),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary,
@@ -185,13 +182,13 @@ fun HistoryCard(
                     onExpandedChange = { if (isConnected && !isLoading) expandedLimit = !expandedLimit },
                     modifier = Modifier.weight(1f)
                 ) {
-                    androidx.compose.material3.OutlinedTextField(
-                        value = "최근 $historyLimit 개",
+                    OutlinedTextField(
+                        value = stringResource(R.string.history_recent_items, historyLimit),
                         onValueChange = {},
                         readOnly = true,
                         label = { 
                             Text(
-                                text = "조회 개수", 
+                                text = stringResource(R.string.history_query_count_label), 
                                 color = InkPrimary, 
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
@@ -229,7 +226,7 @@ fun HistoryCard(
                             DropdownMenuItem(
                                 text = { 
                                     Text(
-                                        text = "최근 $lim 개",
+                                        text = stringResource(R.string.history_recent_items, lim),
                                         color = InkPrimary,
                                         fontWeight = FontWeight.Medium
                                     ) 
@@ -264,7 +261,7 @@ fun HistoryCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "수집 중...", 
+                            text = stringResource(R.string.history_btn_loading), 
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             softWrap = false
@@ -277,7 +274,7 @@ fun HistoryCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "기록 불러오기", 
+                            text = stringResource(R.string.history_btn_fetch), 
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
                             maxLines = 1,
@@ -310,7 +307,11 @@ fun HistoryCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (isLoading) "센서로부터 기록을 수신하고 있습니다..." else "불러온 과거 기록이 없습니다. '기록 불러오기'를 누르세요.",
+                        text = if (isLoading) {
+                            stringResource(R.string.history_empty_loading)
+                        } else {
+                            stringResource(R.string.history_empty_idle)
+                        },
                         fontSize = 12.sp,
                         color = InkMuted
                     )
@@ -330,12 +331,30 @@ fun HistoryCard(
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "시각", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = InkPrimary, modifier = Modifier.weight(1.4f))
-                        Text(text = "최고 온/습", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = InkPrimary, modifier = Modifier.weight(1f))
-                        Text(text = "최저 온/습", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = InkPrimary, modifier = Modifier.weight(1f))
+                        Text(
+                            text = stringResource(R.string.history_col_time), 
+                            fontSize = 11.sp, 
+                            fontWeight = FontWeight.Bold, 
+                            color = InkPrimary, 
+                            modifier = Modifier.weight(1.4f)
+                        )
+                        Text(
+                            text = stringResource(R.string.history_col_max), 
+                            fontSize = 11.sp, 
+                            fontWeight = FontWeight.Bold, 
+                            color = InkPrimary, 
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = stringResource(R.string.history_col_min), 
+                            fontSize = 11.sp, 
+                            fontWeight = FontWeight.Bold, 
+                            color = InkPrimary, 
+                            modifier = Modifier.weight(1f)
+                        )
                     }
 
-                    // 테이블 행 목록 (최대 높이 220dp 스크롤)
+                    // 테이블 행 목록
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()

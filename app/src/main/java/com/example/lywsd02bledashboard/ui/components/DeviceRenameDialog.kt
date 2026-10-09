@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.InkSecondary
@@ -29,7 +31,7 @@ import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 
 /**
- * 기기 별칭(Alias) 수정 다이얼로그 (순백색 라이트 테마)
+ * 기기 별칭(Alias) 수정 다이얼로그
  */
 @Composable
 fun DeviceRenameDialog(
@@ -47,7 +49,7 @@ fun DeviceRenameDialog(
         shape = RoundedCornerShape(16.dp),
         title = {
             Text(
-                text = "기기 별칭 수정",
+                text = stringResource(R.string.rename_dialog_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = InkPrimary
@@ -56,7 +58,7 @@ fun DeviceRenameDialog(
         text = {
             Column {
                 Text(
-                    text = "이 기기를 알아보기 쉬운 친숙한 이름(예: 거실, 안방, 사무실)으로 변경하세요.",
+                    text = stringResource(R.string.rename_dialog_desc),
                     fontSize = 13.sp,
                     color = InkSecondary,
                     lineHeight = 18.sp
@@ -67,7 +69,7 @@ fun DeviceRenameDialog(
                     onValueChange = { aliasText = it },
                     label = { 
                         Text(
-                            text = "기기 별칭",
+                            text = stringResource(R.string.rename_dialog_label),
                             color = InkPrimary,
                             fontWeight = FontWeight.Bold
                         ) 
@@ -96,7 +98,11 @@ fun DeviceRenameDialog(
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.height(36.dp)
             ) {
-                Text(text = "저장", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(
+                    text = stringResource(R.string.rename_dialog_btn_save), 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 13.sp
+                )
             }
         },
         dismissButton = {
@@ -107,7 +113,12 @@ fun DeviceRenameDialog(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = InkPrimary),
                 modifier = Modifier.height(36.dp)
             ) {
-                Text(text = "취소", color = InkPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(
+                    text = stringResource(R.string.rename_dialog_btn_cancel), 
+                    color = InkPrimary, 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 13.sp
+                )
             }
         }
     )

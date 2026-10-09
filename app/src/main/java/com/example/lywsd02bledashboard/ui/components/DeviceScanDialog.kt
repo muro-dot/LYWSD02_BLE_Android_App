@@ -40,10 +40,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.ScannedDeviceInfo
 import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
@@ -55,7 +57,7 @@ import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 
 /**
- * 주변의 LYWSD02 센서 검색 결과 모달 다이얼로그 (순백색 라이트 테마)
+ * 주변의 LYWSD02 센서 검색 결과 모달 다이얼로그
  */
 @Composable
 fun DeviceScanDialog(
@@ -72,7 +74,6 @@ fun DeviceScanDialog(
         devices.partition { it.isLywsd02 }
     }
 
-    // 1순위 기기가 새로 추가되거나 첫 항목이 바뀔 때 애니메이션 지연 없이 즉각 0번 인덱스로 스크롤 고정
     val topKey = devices.firstOrNull()?.address
     LaunchedEffect(topKey, lywsdDevices.size) {
         if (!listState.isScrollInProgress) {
@@ -109,7 +110,7 @@ fun DeviceScanDialog(
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = "기기 검색",
+                        text = stringResource(R.string.scan_dialog_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary
@@ -130,7 +131,7 @@ fun DeviceScanDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "다시 검색",
+                            contentDescription = stringResource(R.string.scan_dialog_cd_refresh),
                             tint = TealPrimary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -141,7 +142,11 @@ fun DeviceScanDialog(
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = if (isScanning) "주변의 BLE 기기를 검색 중입니다" else "주변의 BLE 기기 검색을 완료하였습니다",
+                    text = if (isScanning) {
+                        stringResource(R.string.scan_dialog_searching)
+                    } else {
+                        stringResource(R.string.scan_dialog_completed)
+                    },
                     fontSize = 13.sp,
                     color = if (isScanning) InkSecondary else TealPrimary,
                     fontWeight = if (isScanning) FontWeight.Normal else FontWeight.SemiBold,
@@ -167,7 +172,7 @@ fun DeviceScanDialog(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "주변 신호를 탐색하고 있습니다...",
+                                text = stringResource(R.string.scan_dialog_listening),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = InkPrimary
@@ -184,7 +189,7 @@ fun DeviceScanDialog(
                             .background(SurfaceSoft)
                             .border(1.dp, BorderLine, RoundedCornerShape(10.dp))
                     ) {
-                        // 1순위: LYWSD02 기기 목록 (최상단 고정 노출)
+                        // 1순위: LYWSD02 기기 목록
                         if (lywsdDevices.isNotEmpty()) {
                             item(key = "header_lywsd") {
                                 Box(
@@ -194,7 +199,7 @@ fun DeviceScanDialog(
                                         .padding(horizontal = 14.dp, vertical = 6.dp)
                                 ) {
                                     Text(
-                                        text = "⭐ 감지된 LYWSD02 센서 (${lywsdDevices.size})",
+                                        text = stringResource(R.string.scan_dialog_section_lywsd, lywsdDevices.size),
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TealPrimary
@@ -218,7 +223,7 @@ fun DeviceScanDialog(
                                             .padding(horizontal = 14.dp, vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = "기타 주변 BLE 기기 (${otherDevices.size})",
+                                            text = stringResource(R.string.scan_dialog_section_other, otherDevices.size),
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = InkSecondary
@@ -245,7 +250,7 @@ fun DeviceScanDialog(
                 modifier = Modifier.height(36.dp)
             ) {
                 Text(
-                    text = "닫기",
+                    text = stringResource(R.string.scan_dialog_btn_close),
                     color = InkPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp
@@ -256,7 +261,7 @@ fun DeviceScanDialog(
 }
 
 /**
- * 스캔된 BLE 기기 항목 행(Row) 컴포넌트
+ * 스캔된 BLE 기기 항목 행 컴포넌트
  */
 @Composable
 private fun DeviceItemRow(
@@ -304,7 +309,7 @@ private fun DeviceItemRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.SignalCellularAlt,
-                contentDescription = "신호 세기",
+                contentDescription = stringResource(R.string.scan_dialog_signal_strength),
                 tint = if (isLywsd02) TealPrimary else CyanAccent,
                 modifier = Modifier.size(16.dp)
             )

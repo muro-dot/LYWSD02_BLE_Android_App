@@ -36,10 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusAmber
@@ -106,13 +108,13 @@ fun PermissionHandler(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "블루투스 권한 필요",
+                            text = stringResource(R.string.perm_title),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary
                         )
                         Text(
-                            text = "센서 탐색 및 데이터 수신을 위해 권한이 필요합니다.",
+                            text = stringResource(R.string.perm_subtitle),
                             fontSize = 11.sp,
                             color = InkMuted
                         )
@@ -130,7 +132,10 @@ fun PermissionHandler(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "권한 허용하기", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.perm_btn_grant), 
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest"><img src="https://img.shields.io/github/v/release/muro-dot/lywsd02-ble-android-app?color=blue&label=Latest%20Release" alt="Latest Release"></a>
   <a href="https://github.com/muro-dot/lywsd02-ble-android-app/releases"><img src="https://img.shields.io/github/downloads/muro-dot/lywsd02-ble-android-app/total?color=blueviolet&logo=github&label=Downloads" alt="Total Downloads"></a>
-  <a href="https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest/download/lywsd02-ble-android-app-v1.2.4.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
+  <a href="https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest/download/lywsd02-ble-android-app-v1.2.5.apk"><img src="https://img.shields.io/badge/Download-APK-success?logo=android" alt="Download APK"></a>
   <img src="https://img.shields.io/badge/License-GPL--3.0-orange" alt="License">
 </p>
 <p align="center">
@@ -29,6 +29,7 @@
 
 | Feature | Description |
 | :--- | :--- |
+| 🌐 **Multi-Language Support** | Full English fallback support for non-Korean system locales and in-app manual language switching (System / 한국어 / English). |
 | ⏰ **Clock Synchronization** | Synchronizes device time down to the second using your phone's local time and selected timezone offset. Automatically prompts or recalibrates when a clock drift exceeding 10 seconds is detected. |
 | ⚙️ **Display & Unit Settings** | Permanently configure Celsius (°C) or Fahrenheit (°F) display preferences stored directly in device memory, and toggle between 12-hour and 24-hour clock formats. |
 | 🌡️ **Real-Time Sensor Monitoring** | Live streaming of ambient temperature, relative humidity, and battery percentage with animated progress indicators and packet reception counters. |
@@ -53,7 +54,7 @@
 
 You can download the pre-compiled APK directly from the [GitHub Releases](https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest) page:
 
-- 📦 **Latest APK**: [lywsd02-ble-android-app-v1.2.4.apk](https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest/download/lywsd02-ble-android-app-v1.2.4.apk)
+- 📦 **Latest APK**: [lywsd02-ble-android-app-v1.2.5.apk](https://github.com/muro-dot/lywsd02-ble-android-app/releases/latest/download/lywsd02-ble-android-app-v1.2.5.apk)
 - Requires Android 7.0 (API 24) or higher.
 
 ---

@@ -1,3 +1,158 @@
 <resources>
+    <!-- App & General -->
     <string name="app_name">LYWSD02 BLE Dashboard</string>
+    <string name="app_header_title">LYWSD02 BLE</string>
+    <string name="app_header_subtitle">Xiaomi Mijia Sensor Tool</string>
+    <string name="btn_disconnect">Disconnect</string>
+    <string name="btn_cancel_connection">Cancel</string>
+    <string name="btn_scanning">Scanning…</string>
+    <string name="btn_search_device">Scan Device</string>
+
+    <!-- Device Identity Card -->
+    <string name="device_no_connected">No Device Connected</string>
+    <string name="device_waiting_connection">Waiting for connection</string>
+    <string name="device_btn_rename">Rename</string>
+    <string name="device_mac_address">MAC Address: %1$s</string>
+    <string name="device_mac_copied">MAC address copied to clipboard.</string>
+    <string name="device_cd_rename">Rename Alias</string>
+    <string name="device_cd_copy">Copy</string>
+
+    <!-- Sensor Metrics Grid -->
+    <string name="metric_live_title">Live Measurements</string>
+    <string name="metric_packet_count">Packets: %1$d</string>
+    <string name="metric_temp_title">Temperature</string>
+    <string name="metric_humidity_title">Relative Humidity</string>
+    <string name="metric_battery_title">Battery Level</string>
+    <string name="metric_battery_waiting">Waiting…</string>
+    <string name="metric_battery_low">Low (Replace soon)</string>
+    <string name="metric_battery_fair">Fair</string>
+    <string name="metric_battery_good">Good</string>
+    <string name="metric_last_updated">Updated: %1$s</string>
+    <string name="metric_last_battery_updated">Last updated: %1$s</string>
+
+    <!-- Clock Settings Card -->
+    <string name="clock_title">Device Clock &amp; Sync</string>
+    <string name="clock_subtitle">Synchronize with phone time</string>
+    <string name="clock_device_current_time">Sensor Current Time</string>
+    <string name="clock_sensor_timezone">Sensor: %1$s</string>
+    <string name="clock_target_timezone_system">Target Timezone (Phone Sync)</string>
+    <string name="clock_target_timezone_manual">Target Timezone (Manual)</string>
+    <string name="clock_phone_system_timezone">Phone System Timezone</string>
+    <string name="clock_currently_selected">Currently Selected</string>
+    <string name="clock_revert_to_system_tz">📱 Revert to Phone System Timezone</string>
+    <string name="clock_display_format">Display Format:</string>
+    <string name="clock_format_24h">24-Hour</string>
+    <string name="clock_format_12h">12-Hour (MMC)</string>
+    <string name="clock_auto_sync_label">Auto-sync clock when drift &gt; 10s on connect</string>
+    <string name="clock_btn_syncing">Syncing Clock…</string>
+    <string name="clock_btn_sync_now">Sync Clock Now</string>
+    <string name="clock_cd_refresh">Refresh Time</string>
+
+    <!-- Timezones -->
+    <string name="tz_kst_jst">South Korea, Japan (KST/JST)</string>
+    <string name="tz_cst">China, Taiwan, Singapore (CST)</string>
+    <string name="tz_ict">Vietnam, Thailand, W.Indonesia (ICT)</string>
+    <string name="tz_ist">India, Sri Lanka (IST)</string>
+    <string name="tz_gst">UAE, Dubai (GST)</string>
+    <string name="tz_msk_ast">Saudi, Turkey, Moscow (MSK/AST)</string>
+    <string name="tz_eet_sast">Greece, Egypt, S.Africa (EET/SAST)</string>
+    <string name="tz_cet">Central Europe (CET)</string>
+    <string name="tz_utc_gmt">Greenwich, UK, Portugal (UTC/GMT)</string>
+    <string name="tz_brt_art">Brazil, Argentina (BRT/ART)</string>
+    <string name="tz_est">US Eastern (EST)</string>
+    <string name="tz_cst_us">US Central (CST)</string>
+    <string name="tz_mst">US Mountain (MST)</string>
+    <string name="tz_pst">US Pacific (PST)</string>
+    <string name="tz_akst">Alaska (AKST)</string>
+    <string name="tz_hst">Hawaii (HST)</string>
+    <string name="tz_aest">E.Australia, Guam (AEST/ChST)</string>
+    <string name="tz_nzst">New Zealand (NZST)</string>
+    <string name="tz_offset_minutes">Offset %1$d min</string>
+
+    <!-- Clock Drift Formatting -->
+    <string name="drift_synced">Synced (%1$ds drift)</string>
+    <string name="drift_fast">%1$ds fast</string>
+    <string name="drift_slow">%1$ds slow</string>
+    <string name="drift_none">No drift info</string>
+
+    <!-- Settings (Display & Language) Card -->
+    <string name="settings_card_title">Display &amp; Language Settings</string>
+    <string name="settings_card_subtitle">Sensor display unit and app language</string>
+    <string name="settings_temp_unit_title">Sensor Display Unit</string>
+    <string name="settings_temp_unit_subtitle">Change temperature unit on sensor LCD</string>
+    <string name="settings_unit_celsius">Celsius (°C)</string>
+    <string name="settings_unit_fahrenheit">Fahrenheit (°F)</string>
+    <string name="settings_btn_saving">Saving…</string>
+    <string name="settings_btn_save_unit">Save Unit</string>
+    <string name="settings_language_title">App Language</string>
+    <string name="settings_language_subtitle">Manual selection or follow system language</string>
+    <string name="settings_lang_system">Follow System</string>
+    <string name="settings_lang_korean">한국어</string>
+    <string name="settings_lang_english">English</string>
+
+    <!-- History Card -->
+    <string name="history_card_title">History Records</string>
+    <string name="history_card_subtitle">Sensor built-in memory statistics</string>
+    <string name="history_btn_export_csv">Export CSV</string>
+    <string name="history_cd_export_csv">Export CSV</string>
+    <string name="history_query_count_label">Fetch Count</string>
+    <string name="history_recent_items">Last %1$d items</string>
+    <string name="history_btn_loading">Fetching…</string>
+    <string name="history_btn_fetch">Fetch History</string>
+    <string name="history_empty_loading">Receiving records from sensor…</string>
+    <string name="history_empty_idle">No history records loaded. Tap \'Fetch History\'.</string>
+    <string name="history_col_time">Time</string>
+    <string name="history_col_max">Max Temp/Hum</string>
+    <string name="history_col_min">Min Temp/Hum</string>
+
+    <!-- Known Devices Card -->
+    <string name="known_devices_title">Recent Devices (%1$d)</string>
+    <string name="known_devices_subtitle">Tap to reconnect immediately.</string>
+    <string name="known_devices_connected_tag">(Connected)</string>
+    <string name="known_devices_item_info">Addr: %1$s · Last: %2$s</string>
+    <string name="known_devices_cd_delete">Delete</string>
+
+    <!-- Log Console Card -->
+    <string name="log_card_title">Operation &amp; Event Logs</string>
+    <string name="log_card_subtitle">BLE communication and data history</string>
+    <string name="log_btn_clear">Clear</string>
+    <string name="log_cd_clear">Clear Logs</string>
+    <string name="log_empty">No logs recorded.</string>
+
+    <!-- Device Scan Dialog -->
+    <string name="scan_dialog_title">Scan Devices</string>
+    <string name="scan_dialog_cd_refresh">Scan Again</string>
+    <string name="scan_dialog_searching">Scanning for nearby BLE devices…</string>
+    <string name="scan_dialog_completed">Nearby BLE device scan completed</string>
+    <string name="scan_dialog_listening">Searching for nearby signals…</string>
+    <string name="scan_dialog_section_lywsd">⭐ Detected LYWSD02 Sensors (%1$d)</string>
+    <string name="scan_dialog_section_other">Other BLE Devices (%1$d)</string>
+    <string name="scan_dialog_signal_strength">Signal Strength</string>
+    <string name="scan_dialog_btn_close">Close</string>
+
+    <!-- Device Rename Dialog -->
+    <string name="rename_dialog_title">Edit Device Alias</string>
+    <string name="rename_dialog_desc">Set a friendly name (e.g. Living Room, Bedroom, Office) to easily recognize this device.</string>
+    <string name="rename_dialog_label">Device Alias</string>
+    <string name="rename_dialog_btn_save">Save</string>
+    <string name="rename_dialog_btn_cancel">Cancel</string>
+
+    <!-- Update Dialog -->
+    <string name="update_dialog_title">New Update Available</string>
+    <string name="update_dialog_prompt">Download and install the latest update to get new features and bug fixes?</string>
+    <string name="update_dialog_downloading">Downloading update APK…</string>
+    <string name="update_dialog_completed">Download complete. Please proceed with installation.</string>
+    <string name="update_dialog_btn_update">Update Now</string>
+    <string name="update_dialog_btn_install">Install Now</string>
+    <string name="update_dialog_btn_later">Later</string>
+    <string name="update_dialog_btn_close">Close</string>
+
+    <!-- Permission Handler -->
+    <string name="perm_title">Bluetooth Permissions Required</string>
+    <string name="perm_subtitle">Permissions are needed to scan and receive sensor data.</string>
+    <string name="perm_btn_grant">Grant Permissions</string>
+
+    <!-- Footer -->
+    <string name="footer_release_date">Release Date: 2026. 10. 10</string>
+    <string name="footer_check_updates">Check for Updates</string>
 </resources>

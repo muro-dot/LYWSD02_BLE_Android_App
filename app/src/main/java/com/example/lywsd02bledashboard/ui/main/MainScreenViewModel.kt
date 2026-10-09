@@ -56,7 +56,8 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             targetTimezoneMinutes = repository.savedTimezoneMinutes,
             isUsingSystemTimezone = repository.useSystemTimezone,
             deviceTimezoneMinutes = null,
-            knownDevices = repository.getKnownDevices()
+            knownDevices = repository.getKnownDevices(),
+            appLanguage = repository.appLanguage
         )
     )
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
@@ -393,6 +394,14 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             }
             _uiState.update { it.copy(isUpdatingUnit = false) }
         }
+    }
+
+    /**
+     * 앱 표시 언어 변경 ("system", "ko", "en")
+     */
+    fun setAppLanguage(lang: String) {
+        repository.appLanguage = lang
+        _uiState.update { it.copy(appLanguage = lang) }
     }
 
     fun setHistoryLimit(limit: Int) {

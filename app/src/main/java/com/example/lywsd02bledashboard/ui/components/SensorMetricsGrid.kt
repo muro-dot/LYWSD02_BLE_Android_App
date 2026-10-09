@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BatteryAlert
@@ -34,13 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.TemperatureUnit
 import com.example.lywsd02bledashboard.theme.CyanAccent
-import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.InkSecondary
@@ -73,7 +73,7 @@ fun SensorMetricsGrid(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "실시간 센서 측정",
+                text = stringResource(R.string.metric_live_title),
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = InkPrimary
@@ -84,7 +84,7 @@ fun SensorMetricsGrid(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "수신 횟수: $updateCount 회",
+                        text = stringResource(R.string.metric_packet_count, updateCount),
                         fontSize = 11.sp,
                         color = InkMuted,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -95,14 +95,14 @@ fun SensorMetricsGrid(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 온도 & 습도 가로 2열 배치 (상하 길이 동일하게 맞춤)
+        // 온도 & 습도 가로 2열 배치
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 온도 카드 (0°C ~ 40°C 기준 프로그레스 바 포함하여 습도 카드와 대칭 높이 유지)
+            // 온도 카드
             val displayTemp = if (temperatureC != null) {
                 if (unit == TemperatureUnit.FAHRENHEIT) {
                     val f = (temperatureC * 9f / 5f) + 32f
@@ -119,7 +119,7 @@ fun SensorMetricsGrid(
             val animatedTemp by animateFloatAsState(targetValue = tempProgress, label = "tempProgress")
 
             MetricCard(
-                title = "현재 온도",
+                title = stringResource(R.string.metric_temp_title),
                 value = displayTemp,
                 icon = Icons.Default.DeviceThermostat,
                 iconTint = TealPrimary,
@@ -137,7 +137,7 @@ fun SensorMetricsGrid(
             val animatedHumidity by animateFloatAsState(targetValue = humidityProgress, label = "humProgress")
 
             MetricCard(
-                title = "상대 습도",
+                title = stringResource(R.string.metric_humidity_title),
                 value = displayHumidity,
                 icon = Icons.Default.WaterDrop,
                 iconTint = CyanAccent,
@@ -157,11 +157,17 @@ fun SensorMetricsGrid(
         val batteryProgress = ((battery ?: 0) / 100f).coerceIn(0f, 1f)
         val animatedBattery by animateFloatAsState(targetValue = batteryProgress, label = "batProgress")
 
-        val (batColor, batIcon, batHint) = when {
-            battery == null -> Triple(InkMuted, Icons.Default.BatteryFull, "측정 대기 중")
-            battery <= 20 -> Triple(StatusRed, Icons.Default.BatteryAlert, "배터리 부족 (교체 권장)")
-            battery <= 50 -> Triple(StatusAmber, Icons.Default.BatteryFull, "양호")
-            else -> Triple(StatusGreen, Icons.Default.BatteryFull, "충분함")
+        val batHint = when {
+            battery == null -> stringResource(R.string.metric_battery_waiting)
+            battery <= 20 -> stringResource(R.string.metric_battery_low)
+            battery <= 50 -> stringResource(R.string.metric_battery_fair)
+            else -> stringResource(R.string.metric_battery_good)
+        }
+        val (batColor, batIcon) = when {
+            battery == null -> Pair(InkMuted, Icons.Default.BatteryFull)
+            battery <= 20 -> Pair(StatusRed, Icons.Default.BatteryAlert)
+            battery <= 50 -> Pair(StatusAmber, Icons.Default.BatteryFull)
+            else -> Pair(StatusGreen, Icons.Default.BatteryFull)
         }
 
         Card(
@@ -194,7 +200,7 @@ fun SensorMetricsGrid(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "배터리 잔량",
+                                text = stringResource(R.string.metric_battery_title),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = InkSecondary
@@ -233,7 +239,7 @@ fun SensorMetricsGrid(
                 if (lastBatteryTime != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "마지막 갱신: $lastBatteryTime",
+                        text = stringResource(R.string.metric_last_battery_updated, lastBatteryTime),
                         fontSize = 11.sp,
                         color = InkSecondary,
                         modifier = Modifier.align(Alignment.End)
@@ -315,7 +321,7 @@ private fun MetricCard(
             if (timestamp != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "갱신: $timestamp",
+                    text = stringResource(R.string.metric_last_updated, timestamp),
                     fontSize = 10.sp,
                     color = InkMuted,
                     modifier = Modifier.align(Alignment.End)

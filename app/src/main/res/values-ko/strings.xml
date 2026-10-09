@@ -1,0 +1,158 @@
+<resources>
+    <!-- App & General -->
+    <string name="app_name">LYWSD02 BLE Dashboard</string>
+    <string name="app_header_title">LYWSD02 BLE</string>
+    <string name="app_header_subtitle">Xiaomi Mijia 센서 툴</string>
+    <string name="btn_disconnect">연결 해제</string>
+    <string name="btn_cancel_connection">연결 취소</string>
+    <string name="btn_scanning">검색 중…</string>
+    <string name="btn_search_device">기기 검색</string>
+
+    <!-- Device Identity Card -->
+    <string name="device_no_connected">연결된 기기 없음</string>
+    <string name="device_waiting_connection">기기 연결 대기 중</string>
+    <string name="device_btn_rename">이름변경</string>
+    <string name="device_mac_address">MAC 주소: %1$s</string>
+    <string name="device_mac_copied">MAC 주소가 복사되었습니다.</string>
+    <string name="device_cd_rename">별칭 변경</string>
+    <string name="device_cd_copy">복사</string>
+
+    <!-- Sensor Metrics Grid -->
+    <string name="metric_live_title">실시간 센서 측정</string>
+    <string name="metric_packet_count">수신 횟수: %1$d 회</string>
+    <string name="metric_temp_title">현재 온도</string>
+    <string name="metric_humidity_title">상대 습도</string>
+    <string name="metric_battery_title">배터리 잔량</string>
+    <string name="metric_battery_waiting">측정 대기 중</string>
+    <string name="metric_battery_low">배터리 부족 (교체 권장)</string>
+    <string name="metric_battery_fair">양호</string>
+    <string name="metric_battery_good">충분함</string>
+    <string name="metric_last_updated">갱신: %1$s</string>
+    <string name="metric_last_battery_updated">마지막 갱신: %1$s</string>
+
+    <!-- Clock Settings Card -->
+    <string name="clock_title">기기 시계 및 동기화</string>
+    <string name="clock_subtitle">스마트폰 시간 기준 동기화</string>
+    <string name="clock_device_current_time">센서 현재 시간</string>
+    <string name="clock_sensor_timezone">센서: %1$s</string>
+    <string name="clock_target_timezone_system">목표 타임존 (스마트폰 연동 중)</string>
+    <string name="clock_target_timezone_manual">목표 타임존 (수동 설정)</string>
+    <string name="clock_phone_system_timezone">스마트폰 시스템 타임존</string>
+    <string name="clock_currently_selected">현재 선택됨</string>
+    <string name="clock_revert_to_system_tz">📱 폰 시스템 타임존으로 되돌리기</string>
+    <string name="clock_display_format">표시 형식:</string>
+    <string name="clock_format_24h">24시간</string>
+    <string name="clock_format_12h">12시간 (MMC)</string>
+    <string name="clock_auto_sync_label">연결 시 10초 이상 오차 발생 시 자동 시계 보정</string>
+    <string name="clock_btn_syncing">시계 동기화 중…</string>
+    <string name="clock_btn_sync_now">지금 시계 동기화</string>
+    <string name="clock_cd_refresh">시간 새로고침</string>
+
+    <!-- Timezones -->
+    <string name="tz_kst_jst">대한민국, 일본 (KST/JST)</string>
+    <string name="tz_cst">중국, 대만, 싱가포르 (CST)</string>
+    <string name="tz_ict">베트남, 태국, 인도네시아 서부 (ICT)</string>
+    <string name="tz_ist">인도, 스리랑카 (IST)</string>
+    <string name="tz_gst">UAE, 두바이 (GST)</string>
+    <string name="tz_msk_ast">사우디, 튀르키예, 모스크바 (MSK/AST)</string>
+    <string name="tz_eet_sast">그리스, 이집트, 남아공 (EET/SAST)</string>
+    <string name="tz_cet">중앙유럽 (CET)</string>
+    <string name="tz_utc_gmt">그리니치, 영국, 포르투갈 (UTC/GMT)</string>
+    <string name="tz_brt_art">브라질, 아르헨티나 (BRT/ART)</string>
+    <string name="tz_est">미국 동부 (EST)</string>
+    <string name="tz_cst_us">미국 중부 (CST)</string>
+    <string name="tz_mst">미국 산악 (MST)</string>
+    <string name="tz_pst">미국 서부 (PST)</string>
+    <string name="tz_akst">알래스카 (AKST)</string>
+    <string name="tz_hst">하와이 (HST)</string>
+    <string name="tz_aest">호주 동부, 괌 (AEST/ChST)</string>
+    <string name="tz_nzst">뉴질랜드 (NZST)</string>
+    <string name="tz_offset_minutes">오프셋 %1$d 분</string>
+
+    <!-- Clock Drift Formatting -->
+    <string name="drift_synced">동기화됨 (오차 %1$d초)</string>
+    <string name="drift_fast">%1$d초 빠름</string>
+    <string name="drift_slow">%1$d초 느림</string>
+    <string name="drift_none">시간 오차 정보 없음</string>
+
+    <!-- Settings (Display & Language) Card -->
+    <string name="settings_card_title">디스플레이 및 언어 설정</string>
+    <string name="settings_card_subtitle">센서 액정 단위 및 앱 언어 설정</string>
+    <string name="settings_temp_unit_title">디스플레이 단위 설정</string>
+    <string name="settings_temp_unit_subtitle">센서 액정 화면의 온도 단위를 변경합니다.</string>
+    <string name="settings_unit_celsius">섭씨 (°C)</string>
+    <string name="settings_unit_fahrenheit">화씨 (°F)</string>
+    <string name="settings_btn_saving">저장 중…</string>
+    <string name="settings_btn_save_unit">단위 저장</string>
+    <string name="settings_language_title">앱 표시 언어</string>
+    <string name="settings_language_subtitle">수동 언어 선택 또는 휴대폰 설정 따름</string>
+    <string name="settings_lang_system">시스템 기본</string>
+    <string name="settings_lang_korean">한국어</string>
+    <string name="settings_lang_english">English</string>
+
+    <!-- History Card -->
+    <string name="history_card_title">과거 온습도 기록</string>
+    <string name="history_card_subtitle">센서 내장 메모리 통계</string>
+    <string name="history_btn_export_csv">CSV 내보내기</string>
+    <string name="history_cd_export_csv">CSV 내보내기</string>
+    <string name="history_query_count_label">조회 개수</string>
+    <string name="history_recent_items">최근 %1$d 개</string>
+    <string name="history_btn_loading">수집 중…</string>
+    <string name="history_btn_fetch">기록 불러오기</string>
+    <string name="history_empty_loading">센서로부터 기록을 수신하고 있습니다…</string>
+    <string name="history_empty_idle">불러온 과거 기록이 없습니다. \'기록 불러오기\'를 누르세요.</string>
+    <string name="history_col_time">시각</string>
+    <string name="history_col_max">최고 온/습</string>
+    <string name="history_col_min">최저 온/습</string>
+
+    <!-- Known Devices Card -->
+    <string name="known_devices_title">최근 연결 기기 (%1$d대)</string>
+    <string name="known_devices_subtitle">항목을 누르면 즉시 재연결합니다.</string>
+    <string name="known_devices_connected_tag">(연결 중)</string>
+    <string name="known_devices_item_info">주소: %1$s · 최근: %2$s</string>
+    <string name="known_devices_cd_delete">삭제</string>
+
+    <!-- Log Console Card -->
+    <string name="log_card_title">작업 및 이벤트 로그</string>
+    <string name="log_card_subtitle">BLE 통신 상태 및 데이터 수신 내역</string>
+    <string name="log_btn_clear">지우기</string>
+    <string name="log_cd_clear">로그 지우기</string>
+    <string name="log_empty">기록된 로그가 없습니다.</string>
+
+    <!-- Device Scan Dialog -->
+    <string name="scan_dialog_title">기기 검색</string>
+    <string name="scan_dialog_cd_refresh">다시 검색</string>
+    <string name="scan_dialog_searching">주변의 BLE 기기를 검색 중입니다…</string>
+    <string name="scan_dialog_completed">주변의 BLE 기기 검색을 완료하였습니다</string>
+    <string name="scan_dialog_listening">주변 신호를 탐색하고 있습니다…</string>
+    <string name="scan_dialog_section_lywsd">⭐ 감지된 LYWSD02 센서 (%1$d)</string>
+    <string name="scan_dialog_section_other">기타 주변 BLE 기기 (%1$d)</string>
+    <string name="scan_dialog_signal_strength">신호 세기</string>
+    <string name="scan_dialog_btn_close">닫기</string>
+
+    <!-- Device Rename Dialog -->
+    <string name="rename_dialog_title">기기 별칭 수정</string>
+    <string name="rename_dialog_desc">이 기기를 알아보기 쉬운 친숙한 이름(예: 거실, 안방, 사무실)으로 변경하세요.</string>
+    <string name="rename_dialog_label">기기 별칭</string>
+    <string name="rename_dialog_btn_save">저장</string>
+    <string name="rename_dialog_btn_cancel">취소</string>
+
+    <!-- Update Dialog -->
+    <string name="update_dialog_title">새로운 업데이트 발견</string>
+    <string name="update_dialog_prompt">지금 업데이트를 다운로드하여 최신 기능과 버그 수정사항을 적용하시겠습니까?</string>
+    <string name="update_dialog_downloading">업데이트 APK 다운로드 중…</string>
+    <string name="update_dialog_completed">다운로드가 완료되었습니다. 설치를 진행하세요.</string>
+    <string name="update_dialog_btn_update">지금 업데이트</string>
+    <string name="update_dialog_btn_install">지금 설치하기</string>
+    <string name="update_dialog_btn_later">나중에</string>
+    <string name="update_dialog_btn_close">닫기</string>
+
+    <!-- Permission Handler -->
+    <string name="perm_title">블루투스 권한 필요</string>
+    <string name="perm_subtitle">센서 탐색 및 데이터 수신을 위해 권한이 필요합니다.</string>
+    <string name="perm_btn_grant">권한 허용하기</string>
+
+    <!-- Footer -->
+    <string name="footer_release_date">출시일자: 2026. 10. 10</string>
+    <string name="footer_check_updates">업데이트 확인</string>
+</resources>

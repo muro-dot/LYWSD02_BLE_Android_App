@@ -32,13 +32,11 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,17 +46,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.ble.BleProtocolParser
 import com.example.lywsd02bledashboard.model.BleConstants
 import com.example.lywsd02bledashboard.model.ClockDisplayMode
 import com.example.lywsd02bledashboard.theme.BorderLine
 import com.example.lywsd02bledashboard.theme.BorderLineStrong
-import com.example.lywsd02bledashboard.theme.CyanAccent
-import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusAmber
@@ -121,13 +119,13 @@ fun ClockSettingsCard(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "기기 시계 및 동기화",
+                            text = stringResource(R.string.clock_title),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary
                         )
                         Text(
-                            text = "스마트폰 시간 기준 동기화",
+                            text = stringResource(R.string.clock_subtitle),
                             fontSize = 11.sp,
                             color = InkMuted
                         )
@@ -141,7 +139,7 @@ fun ClockSettingsCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "시간 새로고침",
+                        contentDescription = stringResource(R.string.clock_cd_refresh),
                         tint = if (isConnected) TealPrimary else InkMuted
                     )
                 }
@@ -164,7 +162,7 @@ fun ClockSettingsCard(
                 ) {
                     Column {
                         Text(
-                            text = "센서 현재 시간",
+                            text = stringResource(R.string.clock_device_current_time),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             color = InkMuted
@@ -181,18 +179,25 @@ fun ClockSettingsCard(
 
                     // 시간 오차 상태
                     Column(horizontalAlignment = Alignment.End) {
+                        val tzString = if (deviceTimezoneMinutes != null) {
+                            BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes)
+                        } else {
+                            "--:--"
+                        }
                         Text(
-                            text = if (deviceTimezoneMinutes != null) {
-                                "센서: ${BleProtocolParser.formatTimezoneOffset(deviceTimezoneMinutes)}"
-                            } else {
-                                "센서: --:--"
-                            },
+                            text = stringResource(R.string.clock_sensor_timezone, tzString),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         val isSynced = clockDriftSeconds != null && Math.abs(clockDriftSeconds) <= 1
+                        val driftText = when {
+                            clockDriftSeconds == null -> stringResource(R.string.drift_none)
+                            Math.abs(clockDriftSeconds) <= 1 -> stringResource(R.string.drift_synced, Math.abs(clockDriftSeconds))
+                            clockDriftSeconds > 0 -> stringResource(R.string.drift_fast, Math.abs(clockDriftSeconds))
+                            else -> stringResource(R.string.drift_slow, Math.abs(clockDriftSeconds))
+                        }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = if (isSynced) Icons.Default.CheckCircle else Icons.Default.Warning,
@@ -202,7 +207,7 @@ fun ClockSettingsCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = BleProtocolParser.formatDriftText(clockDriftSeconds),
+                                text = driftText,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (isSynced) StatusGreen else StatusAmber
@@ -216,23 +221,29 @@ fun ClockSettingsCard(
 
             // 타임존 드롭다운
             var expandedTimezone by remember { mutableStateOf(false) }
+            val tzDesc = getTimezoneDescriptionRes(targetTimezoneMinutes)
+
             ExposedDropdownMenuBox(
                 expanded = expandedTimezone,
                 onExpandedChange = { expandedTimezone = !expandedTimezone },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 val textFieldValue = if (isUsingSystemTimezone) {
-                    "📱 ${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
+                    "📱 ${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} ($tzDesc)"
                 } else {
-                    "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} (${getTimezoneDescription(targetTimezoneMinutes)})"
+                    "${BleProtocolParser.formatTimezoneOffset(targetTimezoneMinutes)} ($tzDesc)"
                 }
-                androidx.compose.material3.OutlinedTextField(
+                OutlinedTextField(
                     value = textFieldValue,
                     onValueChange = {},
                     readOnly = true,
                     label = { 
                         Text(
-                            text = if (isUsingSystemTimezone) "목표 타임존 (스마트폰 연동 중)" else "목표 타임존 (수동 설정)", 
+                            text = if (isUsingSystemTimezone) {
+                                stringResource(R.string.clock_target_timezone_system)
+                            } else {
+                                stringResource(R.string.clock_target_timezone_manual)
+                            }, 
                             color = InkPrimary, 
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp
@@ -268,6 +279,7 @@ fun ClockSettingsCard(
                 ) {
                     val systemOffset = BleProtocolParser.getSystemTimezoneOffsetMinutes()
                     // 1. 스마트폰 시스템 타임존 (항상 최상단에 노출)
+                    val systemTzDesc = getTimezoneDescriptionRes(systemOffset)
                     DropdownMenuItem(
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -276,7 +288,7 @@ fun ClockSettingsCard(
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "스마트폰 시스템 타임존",
+                                            text = stringResource(R.string.clock_phone_system_timezone),
                                             fontWeight = FontWeight.Bold,
                                             color = TealPrimary,
                                             fontSize = 13.sp
@@ -284,7 +296,7 @@ fun ClockSettingsCard(
                                         if (isUsingSystemTimezone) {
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
-                                                text = "현재 선택됨",
+                                                text = stringResource(R.string.clock_currently_selected),
                                                 color = StatusGreen,
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.SemiBold
@@ -292,7 +304,7 @@ fun ClockSettingsCard(
                                         }
                                     }
                                     Text(
-                                        text = "${BleProtocolParser.formatTimezoneOffset(systemOffset)} (${getTimezoneDescription(systemOffset)})",
+                                        text = "${BleProtocolParser.formatTimezoneOffset(systemOffset)} ($systemTzDesc)",
                                         color = InkPrimary,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 12.sp
@@ -309,10 +321,11 @@ fun ClockSettingsCard(
 
                     // 2. 전세계 표준 타임존 목록
                     BleConstants.TIMEZONE_OFFSETS.forEach { offset ->
+                        val itemDesc = getTimezoneDescriptionRes(offset)
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${BleProtocolParser.formatTimezoneOffset(offset)} (${getTimezoneDescription(offset)})",
+                                    text = "${BleProtocolParser.formatTimezoneOffset(offset)} ($itemDesc)",
                                     color = InkPrimary,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -332,11 +345,11 @@ fun ClockSettingsCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    androidx.compose.material3.TextButton(
+                    TextButton(
                         onClick = onSelectSystemTimezone
                     ) {
                         Text(
-                            text = "📱 폰 시스템 타임존으로 되돌리기",
+                            text = stringResource(R.string.clock_revert_to_system_tz),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimary
@@ -354,7 +367,7 @@ fun ClockSettingsCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "표시 형식:",
+                    text = stringResource(R.string.clock_display_format),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     color = InkPrimary
@@ -366,7 +379,11 @@ fun ClockSettingsCard(
                         onClick = { onClockModeChange(ClockDisplayMode.MODE_24H) },
                         colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
                     )
-                    Text(text = "24시간", fontSize = 13.sp, color = InkPrimary)
+                    Text(
+                        text = stringResource(R.string.clock_format_24h),
+                        fontSize = 13.sp,
+                        color = InkPrimary
+                    )
 
                     Spacer(modifier = Modifier.width(12.dp))
 
@@ -375,13 +392,17 @@ fun ClockSettingsCard(
                         onClick = { onClockModeChange(ClockDisplayMode.MODE_12H) },
                         colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
                     )
-                    Text(text = "12시간 (MMC)", fontSize = 13.sp, color = InkPrimary)
+                    Text(
+                        text = stringResource(R.string.clock_format_12h),
+                        fontSize = 13.sp,
+                        color = InkPrimary
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // 자동 동기화 체크박스 (10초 이상 드리프트 발생 시 연결 즉시 자동 동기화)
+            // 자동 동기화 체크박스
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -393,7 +414,7 @@ fun ClockSettingsCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "연결 시 10초 이상 오차 발생 시 자동 시계 보정",
+                    text = stringResource(R.string.clock_auto_sync_label),
                     fontSize = 12.sp,
                     color = InkPrimary
                 )
@@ -419,7 +440,10 @@ fun ClockSettingsCard(
                         strokeWidth = 2.dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "시계 동기화 중...", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.clock_btn_syncing),
+                        fontWeight = FontWeight.Bold
+                    )
                 } else {
                     Icon(
                         imageVector = Icons.Default.Sync,
@@ -427,33 +451,37 @@ fun ClockSettingsCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "지금 시계 동기화", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.clock_btn_sync_now),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
     }
 }
 
-private fun getTimezoneDescription(minutes: Int): String {
+@Composable
+private fun getTimezoneDescriptionRes(minutes: Int): String {
     return when (minutes) {
-        540 -> "대한민국, 일본 (KST/JST)"
-        480 -> "중국, 대만, 싱가포르 (CST)"
-        420 -> "베트남, 태국, 인도네시아 서부 (ICT)"
-        330 -> "인도, 스리랑카 (IST)"
-        240 -> "UAE, 두바이 (GST)"
-        180 -> "사우디, 튀르키예, 모스크바 (MSK/AST)"
-        120 -> "그리스, 이집트, 남아공 (EET/SAST)"
-        60 -> "중앙유럽 (CET)"
-        0 -> "그리니치, 영국, 포르투갈 (UTC/GMT)"
-        -180 -> "브라질, 아르헨티나 (BRT/ART)"
-        -300 -> "미국 동부 (EST)"
-        -360 -> "미국 중부 (CST)"
-        -420 -> "미국 산악 (MST)"
-        -480 -> "미국 서부 (PST)"
-        -540 -> "알래스카 (AKST)"
-        -600 -> "하와이 (HST)"
-        600 -> "호주 동부, 괌 (AEST/ChST)"
-        720 -> "뉴질랜드 (NZST)"
-        else -> "오프셋 $minutes 분"
+        540 -> stringResource(R.string.tz_kst_jst)
+        480 -> stringResource(R.string.tz_cst)
+        420 -> stringResource(R.string.tz_ict)
+        330 -> stringResource(R.string.tz_ist)
+        240 -> stringResource(R.string.tz_gst)
+        180 -> stringResource(R.string.tz_msk_ast)
+        120 -> stringResource(R.string.tz_eet_sast)
+        60 -> stringResource(R.string.tz_cet)
+        0 -> stringResource(R.string.tz_utc_gmt)
+        -180 -> stringResource(R.string.tz_brt_art)
+        -300 -> stringResource(R.string.tz_est)
+        -360 -> stringResource(R.string.tz_cst_us)
+        -420 -> stringResource(R.string.tz_mst)
+        -480 -> stringResource(R.string.tz_pst)
+        -540 -> stringResource(R.string.tz_akst)
+        -600 -> stringResource(R.string.tz_hst)
+        600 -> stringResource(R.string.tz_aest)
+        720 -> stringResource(R.string.tz_nzst)
+        else -> stringResource(R.string.tz_offset_minutes, minutes)
     }
 }

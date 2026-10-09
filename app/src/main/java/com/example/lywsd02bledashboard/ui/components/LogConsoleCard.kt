@@ -33,11 +33,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.LogEntry
 import com.example.lywsd02bledashboard.model.LogType
 import com.example.lywsd02bledashboard.theme.BorderLine
@@ -52,7 +53,7 @@ import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 
 /**
- * 실시간 BLE 이벤트 로그 콘솔 카드 (일관된 라이트 테마 적용)
+ * 실시간 BLE 이벤트 로그 콘솔 카드
  */
 @Composable
 fun LogConsoleCard(
@@ -104,7 +105,7 @@ fun LogConsoleCard(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "작업 및 이벤트 로그",
+                            text = stringResource(R.string.log_card_title),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary,
@@ -112,7 +113,7 @@ fun LogConsoleCard(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "BLE 통신 상태 및 데이터 수신 내역",
+                            text = stringResource(R.string.log_card_subtitle),
                             fontSize = 11.sp,
                             color = InkMuted,
                             maxLines = 1,
@@ -121,7 +122,7 @@ fun LogConsoleCard(
                     }
                 }
 
-                // 지우기 버튼 (선명한 고대비 색상 및 최소 너비 확보)
+                // 지우기 버튼
                 OutlinedButton(
                     onClick = onClearLogs,
                     shape = RoundedCornerShape(8.dp),
@@ -136,13 +137,13 @@ fun LogConsoleCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteSweep,
-                        contentDescription = "로그 지우기",
+                        contentDescription = stringResource(R.string.log_cd_clear),
                         modifier = Modifier.size(14.dp),
                         tint = InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "지우기",
+                        text = stringResource(R.string.log_btn_clear),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary,
@@ -154,7 +155,7 @@ fun LogConsoleCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // 라이트 테마 로그 박스
+            // 로그 박스
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -166,7 +167,7 @@ fun LogConsoleCard(
             ) {
                 if (logs.isEmpty()) {
                     Text(
-                        text = "기록된 로그가 없습니다.",
+                        text = stringResource(R.string.log_empty),
                         color = InkMuted,
                         fontSize = 12.sp,
                         fontFamily = FontFamily.Monospace,
@@ -207,7 +208,7 @@ fun LogConsoleCard(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = log.message,
-                                    color = InkPrimary, // 짙은 글씨색으로 시인성 확보
+                                    color = InkPrimary,
                                     fontSize = 12.sp,
                                     fontFamily = FontFamily.Monospace,
                                     modifier = Modifier.weight(1f)

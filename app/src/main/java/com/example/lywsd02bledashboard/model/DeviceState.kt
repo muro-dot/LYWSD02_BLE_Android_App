@@ -82,7 +82,10 @@ data class DashboardUiState(
     // 깃허브 최신 릴리즈 인앱 업데이트 상태
     val appUpdateInfo: AppUpdateInfo? = null,
     val updateDownloadState: UpdateDownloadState = UpdateDownloadState.Idle,
-    val isUpdateDialogOpen: Boolean = false
+    val isUpdateDialogOpen: Boolean = false,
+
+    // 다국어 언어 설정 ("system", "ko", "en")
+    val appLanguage: String = "system"
 )
 
 /**

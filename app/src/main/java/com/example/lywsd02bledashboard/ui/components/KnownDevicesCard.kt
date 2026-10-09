@@ -26,14 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.KnownDevice
 import com.example.lywsd02bledashboard.theme.BorderLine
-import com.example.lywsd02bledashboard.theme.DeepTeal
 import com.example.lywsd02bledashboard.theme.InkMuted
 import com.example.lywsd02bledashboard.theme.InkPrimary
 import com.example.lywsd02bledashboard.theme.StatusRed
@@ -82,13 +82,13 @@ fun KnownDevicesCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "최근 연결 기기 (${knownDevices.size}대)",
+                        text = stringResource(R.string.known_devices_title, knownDevices.size),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary
                     )
                     Text(
-                        text = "항목을 누르면 즉시 재연결합니다.",
+                        text = stringResource(R.string.known_devices_subtitle),
                         fontSize = 11.sp,
                         color = InkMuted
                     )
@@ -125,7 +125,7 @@ fun KnownDevicesCard(
                                 if (isCurrent) {
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "(연결 중)",
+                                        text = stringResource(R.string.known_devices_connected_tag),
                                         fontSize = 11.sp,
                                         color = TealPrimary,
                                         fontWeight = FontWeight.Bold
@@ -134,7 +134,7 @@ fun KnownDevicesCard(
                             }
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "주소: ${device.id} · 최근: ${device.formattedLastConnected()}",
+                                text = stringResource(R.string.known_devices_item_info, device.id, device.formattedLastConnected()),
                                 fontSize = 11.sp,
                                 color = InkMuted,
                                 fontFamily = FontFamily.Monospace
@@ -147,7 +147,7 @@ fun KnownDevicesCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "삭제",
+                                contentDescription = stringResource(R.string.known_devices_cd_delete),
                                 tint = StatusRed.copy(alpha = 0.7f),
                                 modifier = Modifier.size(18.dp)
                             )

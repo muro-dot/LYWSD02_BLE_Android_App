@@ -25,6 +25,7 @@ class DevicePreferencesRepository(context: Context) {
         private const val KEY_DEFAULT_UNIT = "default_unit"
         private const val KEY_TIMEZONE_MINUTES = "timezone_minutes"
         private const val KEY_USE_SYSTEM_TIMEZONE = "use_system_timezone"
+        private const val KEY_APP_LANGUAGE = "app_language"
     }
 
     /**
@@ -240,5 +241,14 @@ class DevicePreferencesRepository(context: Context) {
         }
         set(value) {
             prefs.edit().putInt(KEY_TIMEZONE_MINUTES, value).apply()
+        }
+
+    /**
+     * 앱 표시 언어 ("system", "ko", "en")
+     */
+    var appLanguage: String
+        get() = prefs.getString(KEY_APP_LANGUAGE, "system") ?: "system"
+        set(value) {
+            prefs.edit().putString(KEY_APP_LANGUAGE, value).apply()
         }
 }
