@@ -3,7 +3,9 @@ package com.example.lywsd02bledashboard.ui.main
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,15 +14,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +44,8 @@ import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.ConnectionState
 import com.example.lywsd02bledashboard.theme.BackgroundPaper
 import com.example.lywsd02bledashboard.theme.InkMuted
+import com.example.lywsd02bledashboard.theme.InkPrimary
+import com.example.lywsd02bledashboard.theme.SurfaceWhite
 import com.example.lywsd02bledashboard.theme.TealPrimary
 import com.example.lywsd02bledashboard.ui.components.ClockSettingsCard
 import com.example.lywsd02bledashboard.ui.components.DeviceIdentityCard
@@ -188,23 +200,143 @@ fun MainScreen(
                     fontSize = 11.sp,
                     color = InkMuted.copy(alpha = 0.8f)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                TextButton(
-                    onClick = { viewModel.checkForUpdates(isManual = true) }
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // 하단 행: [업데이트 확인] 및 [수동 언어 선택 드롭다운]
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.footer_check_updates),
-                        tint = TealPrimary,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.footer_check_updates),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TealPrimary
-                    )
+                    // 업데이트 확인 버튼
+                    TextButton(
+                        onClick = { viewModel.checkForUpdates(isManual = true) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.footer_check_updates),
+                            tint = TealPrimary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.footer_check_updates),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TealPrimary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // 수동 언어 선택 드롭다운 버튼 ('시스템기본값', '영문', '한글')
+                    var expandedLanguageMenu by remember { mutableStateOf(false) }
+
+                    Box {
+                        TextButton(
+                            onClick = { expandedLanguageMenu = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = "Language",
+                                tint = TealPrimary,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            val currentLangLabel = when (state.appLanguage) {
+                                "en" -> stringResource(R.string.settings_lang_english)
+                                "ko" -> stringResource(R.string.settings_lang_korean)
+                                else -> stringResource(R.string.settings_lang_system)
+                            }
+                            Text(
+                                text = currentLangLabel,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TealPrimary
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = TealPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expandedLanguageMenu,
+                            onDismissRequest = { expandedLanguageMenu = false },
+                            modifier = Modifier.background(SurfaceWhite)
+                        ) {
+                            // 1. 시스템기본값
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = stringResource(R.string.settings_lang_system),
+                                            fontWeight = if (state.appLanguage == "system") FontWeight.Bold else FontWeight.Medium,
+                                            color = if (state.appLanguage == "system") TealPrimary else InkPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                        if (state.appLanguage == "system") {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(text = "✓", color = TealPrimary, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    expandedLanguageMenu = false
+                                    viewModel.setAppLanguage("system")
+                                    (context as? Activity)?.recreate()
+                                }
+                            )
+
+                            // 2. 영문 (English)
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = stringResource(R.string.settings_lang_english),
+                                            fontWeight = if (state.appLanguage == "en") FontWeight.Bold else FontWeight.Medium,
+                                            color = if (state.appLanguage == "en") TealPrimary else InkPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                        if (state.appLanguage == "en") {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(text = "✓", color = TealPrimary, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    expandedLanguageMenu = false
+                                    viewModel.setAppLanguage("en")
+                                    (context as? Activity)?.recreate()
+                                }
+                            )
+
+                            // 3. 한글 (한국어)
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = stringResource(R.string.settings_lang_korean),
+                                            fontWeight = if (state.appLanguage == "ko") FontWeight.Bold else FontWeight.Medium,
+                                            color = if (state.appLanguage == "ko") TealPrimary else InkPrimary,
+                                            fontSize = 13.sp
+                                        )
+                                        if (state.appLanguage == "ko") {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(text = "✓", color = TealPrimary, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    expandedLanguageMenu = false
+                                    viewModel.setAppLanguage("ko")
+                                    (context as? Activity)?.recreate()
+                                }
+                            )
+                        }
+                    }
                 }
             }
 

@@ -86,9 +86,9 @@
     <string name="settings_btn_save_unit">단위 저장</string>
     <string name="settings_language_title">앱 표시 언어</string>
     <string name="settings_language_subtitle">수동 언어 선택 또는 휴대폰 설정 따름</string>
-    <string name="settings_lang_system">시스템 기본</string>
-    <string name="settings_lang_korean">한국어</string>
-    <string name="settings_lang_english">English</string>
+    <string name="settings_lang_system">시스템기본값</string>
+    <string name="settings_lang_korean">한글</string>
+    <string name="settings_lang_english">영문</string>
 
     <!-- History Card -->
     <string name="history_card_title">과거 온습도 기록</string>
