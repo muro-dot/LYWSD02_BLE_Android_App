@@ -22,6 +22,7 @@ import com.example.lywsd02bledashboard.model.UpdateDownloadState
 import com.example.lywsd02bledashboard.update.UpdateChecker
 import com.example.lywsd02bledashboard.update.UpdateInstaller
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -150,17 +151,19 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             bleManager.timeFlow.collect { timeResult ->
                 _uiState.update { current ->
-                    current.copy(
-                        deviceTimeFormatted = timeResult.formattedTime,
-                        deviceTimezoneMinutes = timeResult.deviceTimezoneMinutes,
-                        clockDriftSeconds = timeResult.driftSeconds,
-                        clockMode = timeResult.detectedClockMode ?: current.clockMode
-                    )
-                }
-                timeResult.detectedClockMode?.let { detectedMode ->
-                    _uiState.value.connectedDeviceId?.let { deviceId ->
-                        repository.updateDeviceClockMode(deviceId, detectedMode)
+                    // 사용자가 12시간제를 선택했거나, 기기에서 12시간제를 반환한 경우 12시간 형식으로 표시
+                    val displayTime = if (current.clockMode == ClockDisplayMode.MODE_12H || timeResult.detectedClockMode == ClockDisplayMode.MODE_12H) {
+                        BleProtocolParser.formatEpoch(timeResult.localEpochSeconds, isTwelveHour = true)
+                    } else {
+                        timeResult.formattedTime
                     }
+                    current.copy(
+                        deviceTimeFormatted = displayTime,
+                        deviceLocalEpochSeconds = timeResult.localEpochSeconds,
+                        deviceTimezoneMinutes = timeResult.deviceTimezoneMinutes,
+                        clockDriftSeconds = timeResult.driftSeconds
+                        // 주의: 사용자가 선택한 clockMode를 기기 응답으로 임의 덮어쓰지 않음
+                    )
                 }
             }
         }
@@ -198,7 +201,13 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                 desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
                 isTwelveHour = _uiState.value.clockMode == ClockDisplayMode.MODE_12H
             )
-            val effectiveClockMode = timeResult?.detectedClockMode ?: _uiState.value.clockMode
+            // 기존에 설정된 모드가 없는 신규 기기이고 기기에서 12h/24h 모드를 보고한 경우에만 초기값으로 채택
+            val effectiveClockMode = if (known?.clockMode == null && timeResult?.detectedClockMode != null) {
+                timeResult.detectedClockMode
+            } else {
+                _uiState.value.clockMode
+            }
+            _uiState.update { it.copy(clockMode = effectiveClockMode) }
 
             // 4. 자동 시간 동기화 (드리프트가 10초 이상이고 자동 보정 옵션이 켜져 있을 때)
             if (_uiState.value.isAutoSyncClockEnabled && timeResult != null) {
@@ -304,13 +313,32 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun setClockMode(mode: ClockDisplayMode) {
-        _uiState.update { it.copy(clockMode = mode) }
+        val isTwelveHour = (mode == ClockDisplayMode.MODE_12H)
+        _uiState.update { current ->
+            // 현재 표시된 센서 시간을 사용자가 선택한 모드로 즉시 다시 포맷팅
+            val updatedFormattedTime = current.deviceLocalEpochSeconds?.let { epoch ->
+                BleProtocolParser.formatEpoch(epoch, isTwelveHour)
+            } ?: current.deviceTimeFormatted
+
+            current.copy(
+                clockMode = mode,
+                deviceTimeFormatted = updatedFormattedTime
+            )
+        }
         val deviceId = _uiState.value.connectedDeviceId
         if (deviceId != null) {
             repository.updateDeviceClockMode(deviceId, mode)
             _uiState.update { it.copy(knownDevices = repository.getKnownDevices()) }
             if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
-                refreshClock()
+                viewModelScope.launch {
+                    // 기기(LYWSD02MMC/커스텀 기기)에 12h/24h 모드 쓰기 시도
+                    bleManager.setClockMode(mode)
+                    delay(200)
+                    bleManager.readTime(
+                        desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
+                        isTwelveHour = isTwelveHour
+                    )
+                }
             }
         }
     }

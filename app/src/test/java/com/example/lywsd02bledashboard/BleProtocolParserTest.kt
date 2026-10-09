@@ -266,4 +266,17 @@ class BleProtocolParserTest {
         assertNotNull(result)
         assertEquals(null, result!!.detectedClockMode)
     }
+
+    @Test
+    fun testFormatEpoch_twelveHourAndTwentyFourHour() {
+        // 1700000000L = 2023-11-14 22:13:20 UTC
+        val epoch = 1700000000L
+        val formatted24 = BleProtocolParser.formatEpoch(epoch, isTwelveHour = false)
+        val formatted12 = BleProtocolParser.formatEpoch(epoch, isTwelveHour = true)
+
+        assertEquals("22:13:20", formatted24)
+        val hasMarker = formatted12.contains("PM") || formatted12.contains("오후")
+        assertTrue(hasMarker)
+        assertTrue(formatted12.contains("10:13:20"))
+    }
 }

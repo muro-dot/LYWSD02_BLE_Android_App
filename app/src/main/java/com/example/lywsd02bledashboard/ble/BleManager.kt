@@ -636,6 +636,22 @@ class BleManager(
     }
 
     /**
+     * 12시간 / 24시간 표시 모드 변경 쓰기
+     */
+    suspend fun setClockMode(mode: ClockDisplayMode): Boolean {
+        val payload = BleProtocolParser.encodeClockMode(mode)
+        val success = writeCharacteristicBytes(BleConstants.TIME_CHARACTERISTIC_UUID, payload)
+        val modeLabel = if (mode == ClockDisplayMode.MODE_12H) "12시간" else "24시간"
+        if (success) {
+            emitLog("기기 시계 표시 형식을 ${modeLabel} 모드로 설정했습니다.", LogType.INFO)
+        } else {
+            // 구형 기기(5바이트 프로토콜)의 경우 7바이트 쓰기를 거부할 수 있음
+            emitLog("기기 시계 표시 형식(${modeLabel}) 쓰기 미지원 또는 무시됨 (구형 펌웨어)", LogType.INFO)
+        }
+        return success
+    }
+
+    /**
      * 과거 기록(History) 수집
      */
     @SuppressLint("MissingPermission")

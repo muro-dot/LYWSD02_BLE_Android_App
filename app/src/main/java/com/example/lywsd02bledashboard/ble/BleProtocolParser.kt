@@ -136,12 +136,7 @@ object BleProtocolParser {
             isTwelveHour
         }
 
-        val date = Date(localEpoch * 1000L)
-        val pattern = if (effectiveTwelveHour) "hh:mm:ss a" else "HH:mm:ss"
-        val sdf = SimpleDateFormat(pattern, Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
-        val formattedTime = sdf.format(date)
+        val formattedTime = formatEpoch(localEpoch, effectiveTwelveHour)
 
         return ParsedTimeResult(
             localEpochSeconds = localEpoch,
@@ -150,6 +145,18 @@ object BleProtocolParser {
             driftSeconds = drift,
             detectedClockMode = detectedClockMode
         )
+    }
+    
+    /**
+     * Epoch 초를 12시간/24시간 형식 문자열로 변환
+     */
+    fun formatEpoch(epochSeconds: Long, isTwelveHour: Boolean): String {
+        val date = Date(epochSeconds * 1000L)
+        val pattern = if (isTwelveHour) "hh:mm:ss a" else "HH:mm:ss"
+        val sdf = SimpleDateFormat(pattern, Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+        return sdf.format(date)
     }
 
     /**
