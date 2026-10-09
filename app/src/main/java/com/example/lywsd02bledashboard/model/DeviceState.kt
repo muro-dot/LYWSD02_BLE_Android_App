@@ -54,7 +54,6 @@ data class DashboardUiState(
     val isUsingSystemTimezone: Boolean = true, // 스마트폰 시스템 타임존 추종 여부
     val clockDriftSeconds: Long? = null,
     val clockMode: ClockDisplayMode = ClockDisplayMode.MODE_24H,
-    val manualOffsetMinutes: Int = 0,
     val isAutoSyncClockEnabled: Boolean = true,
     val isSyncingClock: Boolean = false,
 
@@ -87,15 +86,28 @@ data class DashboardUiState(
 
 /**
  * BLE 스캔을 통해 발견된 장치 정보
+ *
+ * @param address 블루투스 MAC 주소
+ * @param name 장치에서 브로드캐스팅하는 원본 이름
+ * @param rssi 신호 세기
+ * @param alias 사용자가 이전에 저장한 별칭(변경한 이름)
  */
 data class ScannedDeviceInfo(
     val address: String,
     val name: String,
-    val rssi: Int
+    val rssi: Int,
+    val alias: String? = null
 ) {
     /**
+     * UI에 표시할 이름 (사용자가 변경한 별칭이 있으면 별칭 우선 노출)
+     */
+    val displayName: String
+        get() = if (!alias.isNullOrBlank()) alias else name
+
+    /**
      * 기기명이 'LYWSD02'를 포함하는지 여부 (최상단 정렬 및 UI 강조에 사용)
+     * 원래 이름 또는 설정한 별칭 중 하나라도 LYWSD02를 포함하거나 센서 모델인 경우 true
      */
     val isLywsd02: Boolean
-        get() = name.contains("LYWSD02", ignoreCase = true)
+        get() = name.contains("LYWSD02", ignoreCase = true) || (alias?.contains("LYWSD02", ignoreCase = true) == true)
 }

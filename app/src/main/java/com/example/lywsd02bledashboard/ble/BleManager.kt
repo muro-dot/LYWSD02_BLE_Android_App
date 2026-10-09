@@ -48,7 +48,8 @@ import java.util.UUID
  */
 class BleManager(
     private val context: Context,
-    private val bluetoothAdapter: BluetoothAdapter?
+    private val bluetoothAdapter: BluetoothAdapter?,
+    private val aliasProvider: ((String) -> String?)? = null
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + Job())
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -97,9 +98,10 @@ class BleManager(
     private var pendingWriteDeferred: CompletableDeferred<Boolean>? = null
     private var pendingDescriptorDeferred: CompletableDeferred<Boolean>? = null
 
-    // 재연결 제어
+    // 재연결 및 자동 해제(5분) 제어
     private var isManualDisconnect = false
     private var autoRetryJob: Job? = null
+    private var autoDisconnectJob: Job? = null
     private var retryAttempt = 0
 
     // 동시성(Race Condition) 방지를 위한 스레드 세이프 기기 목록 맵
@@ -143,10 +145,12 @@ class BleManager(
             ?: existing?.name?.takeIf { it != "(알 수 없는 기기)" && it.isNotBlank() }
             ?: "(알 수 없는 기기)"
 
+        val savedAlias = aliasProvider?.invoke(address)
         val info = ScannedDeviceInfo(
             address = address,
             name = finalName,
-            rssi = result.rssi
+            rssi = result.rssi,
+            alias = savedAlias
         )
 
         scannedDevicesMap[address] = info
@@ -164,7 +168,7 @@ class BleManager(
     private fun updateSortedScannedDevices() {
         val sorted = scannedDevicesMap.values.sortedWith(
             compareByDescending<ScannedDeviceInfo> { it.isLywsd02 }
-                .thenByDescending { it.name != "(알 수 없는 기기)" }
+                .thenByDescending { it.displayName != "(알 수 없는 기기)" }
                 .thenByDescending { it.rssi }
         )
         _scannedDevices.value = sorted
@@ -201,6 +205,16 @@ class BleManager(
                 if (mainService != null) {
                     emitLog("LYWSD02 메인 서비스 발견 완료!", LogType.SUCCESS)
                     _connectionState.value = ConnectionState.CONNECTED
+
+                    // 기기 연결 시 5분 후 자동 연결 해제 스케줄링 (배터리 절약)
+                    autoDisconnectJob?.cancel()
+                    autoDisconnectJob = scope.launch {
+                        delay(5 * 60 * 1000L) // 5분
+                        if (_connectionState.value == ConnectionState.CONNECTED) {
+                            emitLog("연결 유지 시간(5분)이 경과하여 배터리 절약을 위해 기기 연결을 자동으로 해제합니다.", LogType.INFO)
+                            disconnect()
+                        }
+                    }
 
                     // 연결 즉시 실시간 온습도 노티피케이션 활성화
                     scope.launch {
@@ -332,9 +346,9 @@ class BleManager(
             return
         }
 
-        // 12초 후 안전하게 자동 스캔 중단
+        // 10초 후 안전하게 자동 스캔 중단
         mainHandler.removeCallbacks(scanTimeoutRunnable)
-        mainHandler.postDelayed(scanTimeoutRunnable, 12000)
+        mainHandler.postDelayed(scanTimeoutRunnable, 10000)
     }
 
     /**
@@ -361,6 +375,7 @@ class BleManager(
     fun connect(address: String, name: String = "LYWSD02") {
         stopScan()
         autoRetryJob?.cancel()
+        autoDisconnectJob?.cancel()
         isManualDisconnect = false
         currentTargetAddress = address
         currentTargetName = name
@@ -393,6 +408,7 @@ class BleManager(
     fun disconnect() {
         isManualDisconnect = true
         autoRetryJob?.cancel()
+        autoDisconnectJob?.cancel()
         _connectionState.value = ConnectionState.DISCONNECTED
         emitLog("연결을 수동으로 해제합니다.", LogType.INFO)
 
@@ -402,6 +418,8 @@ class BleManager(
     @SuppressLint("MissingPermission")
     private fun cleanUpGatt() {
         try {
+            autoDisconnectJob?.cancel()
+            autoDisconnectJob = null
             bluetoothGatt?.disconnect()
             bluetoothGatt?.close()
         } catch (e: Exception) {

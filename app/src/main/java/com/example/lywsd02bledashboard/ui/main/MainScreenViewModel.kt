@@ -41,7 +41,11 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     private val repository = DevicePreferencesRepository(application)
     private val bluetoothManager = application.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
-    val bleManager = BleManager(application, bluetoothManager?.adapter)
+    val bleManager = BleManager(
+        context = application,
+        bluetoothAdapter = bluetoothManager?.adapter,
+        aliasProvider = { repository.getDeviceAlias(it) }
+    )
 
     private val _uiState = MutableStateFlow(
         DashboardUiState(
@@ -219,11 +223,17 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun connectToDevice(address: String, name: String) {
         closeScanDialog()
         val known = repository.getKnownDevices().find { it.id == address }
+        val defaultClockMode = if (name.contains("LYWSD02MMC", ignoreCase = true)) {
+            ClockDisplayMode.MODE_12H
+        } else {
+            _uiState.value.clockMode
+        }
         _uiState.update {
             it.copy(
                 connectedDeviceId = address,
                 connectedDeviceName = name,
                 connectedDeviceAlias = known?.alias,
+                clockMode = defaultClockMode,
                 temperatureCelsius = null,
                 humidityPercentage = null,
                 batteryPercentage = null,
@@ -264,7 +274,7 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
             _uiState.update { it.copy(isSyncingClock = true) }
             bleManager.syncTime(
                 desiredOffsetMinutes = _uiState.value.targetTimezoneMinutes,
-                manualOffsetMinutes = _uiState.value.manualOffsetMinutes,
+                manualOffsetMinutes = 0,
                 clockMode = _uiState.value.clockMode,
                 automatic = isAutomatic
             )
@@ -306,10 +316,6 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
         if (_uiState.value.connectionState == ConnectionState.CONNECTED) {
             refreshClock()
         }
-    }
-
-    fun setManualOffsetMinutes(minutes: Int) {
-        _uiState.update { it.copy(manualOffsetMinutes = minutes) }
     }
 
     fun setAutoSyncClockEnabled(enabled: Boolean) {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.AlertDialog
@@ -29,6 +30,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +62,7 @@ fun DeviceScanDialog(
     devices: List<ScannedDeviceInfo>,
     isScanning: Boolean,
     onDismiss: () -> Unit,
+    onRefreshScan: () -> Unit,
     onDeviceSelect: (ScannedDeviceInfo) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -112,21 +115,36 @@ fun DeviceScanDialog(
                         color = InkPrimary
                     )
                 }
-                if (isScanning) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = TealPrimary,
-                        strokeWidth = 2.dp
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isScanning) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = TealPrimary,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
+                    IconButton(
+                        onClick = onRefreshScan,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "다시 검색",
+                            tint = TealPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "주변의 BLE 기기를 검색 중입니다. LYWSD02 센서가 감지되면 자동으로 최상단에 정렬 및 강조 표시됩니다.",
+                    text = if (isScanning) "주변의 BLE 기기를 검색 중입니다" else "주변의 BLE 기기 검색을 완료하였습니다",
                     fontSize = 13.sp,
-                    color = InkSecondary,
+                    color = if (isScanning) InkSecondary else TealPrimary,
+                    fontWeight = if (isScanning) FontWeight.Normal else FontWeight.SemiBold,
                     lineHeight = 18.sp
                 )
                 Spacer(modifier = Modifier.height(14.dp))
@@ -268,13 +286,14 @@ private fun DeviceItemRow(
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = dev.name,
+                    text = dev.displayName,
                     fontSize = 14.sp,
                     fontWeight = if (isLywsd02) FontWeight.Bold else FontWeight.SemiBold,
                     color = if (isLywsd02) TealPrimary else InkPrimary
                 )
+                val subText = if (!dev.alias.isNullOrBlank()) "${dev.name} · ${dev.address}" else dev.address
                 Text(
-                    text = dev.address,
+                    text = subText,
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
                     color = InkSecondary

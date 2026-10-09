@@ -104,7 +104,6 @@ fun MainScreen(
                 isUsingSystemTimezone = state.isUsingSystemTimezone,
                 clockDriftSeconds = state.clockDriftSeconds,
                 clockMode = state.clockMode,
-                manualOffsetMinutes = state.manualOffsetMinutes,
                 isAutoSyncEnabled = state.isAutoSyncClockEnabled,
                 isSyncing = state.isSyncingClock,
                 isConnected = state.connectionState == ConnectionState.CONNECTED,
@@ -113,7 +112,6 @@ fun MainScreen(
                 onClockModeChange = { viewModel.setClockMode(it) },
                 onTimezoneChange = { viewModel.setTimezoneMinutes(it) },
                 onSelectSystemTimezone = { viewModel.setSystemTimezone() },
-                onManualOffsetChange = { viewModel.setManualOffsetMinutes(it) },
                 onAutoSyncChange = { viewModel.setAutoSyncClockEnabled(it) }
             )
 
@@ -187,6 +185,7 @@ fun MainScreen(
             devices = state.scannedDevices,
             isScanning = state.connectionState == ConnectionState.SCANNING,
             onDismiss = { viewModel.closeScanDialog() },
+            onRefreshScan = { viewModel.startScan() },
             onDeviceSelect = { dev ->
                 viewModel.connectToDevice(dev.address, dev.name)
             }

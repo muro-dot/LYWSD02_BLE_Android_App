@@ -79,7 +79,6 @@ fun ClockSettingsCard(
     isUsingSystemTimezone: Boolean,
     clockDriftSeconds: Long?,
     clockMode: ClockDisplayMode,
-    manualOffsetMinutes: Int,
     isAutoSyncEnabled: Boolean,
     isSyncing: Boolean,
     isConnected: Boolean,
@@ -88,7 +87,6 @@ fun ClockSettingsCard(
     onClockModeChange: (ClockDisplayMode) -> Unit,
     onTimezoneChange: (Int) -> Unit,
     onSelectSystemTimezone: () -> Unit,
-    onManualOffsetChange: (Int) -> Unit,
     onAutoSyncChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -381,41 +379,7 @@ fun ClockSettingsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // 수동 오차 보정 슬라이더 (-30분 ~ +30분)
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "수동 시간 오차 조정",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = InkPrimary
-                    )
-                    Text(
-                        text = "${manualOffsetMinutes}분",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TealPrimary
-                    )
-                }
-
-                Slider(
-                    value = manualOffsetMinutes.toFloat(),
-                    onValueChange = { onManualOffsetChange(it.toInt()) },
-                    valueRange = -30f..30f,
-                    steps = 59,
-                    colors = SliderDefaults.colors(
-                        thumbColor = TealPrimary,
-                        activeTrackColor = TealPrimary,
-                        inactiveTrackColor = SurfaceSoft
-                    ),
-                    enabled = isConnected
-                )
-            }
+            Spacer(modifier = Modifier.height(14.dp))
 
             // 자동 동기화 체크박스 (10초 이상 드리프트 발생 시 연결 즉시 자동 동기화)
             Row(

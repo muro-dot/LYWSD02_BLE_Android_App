@@ -56,6 +56,14 @@ class DevicePreferencesRepository(context: Context) {
     }
 
     /**
+     * 특정 기기 ID(MAC 주소)에 저장된 사용자 별칭(Alias)을 조회합니다.
+     */
+    fun getDeviceAlias(id: String): String? {
+        val known = getKnownDevices().find { it.id.equals(id, ignoreCase = true) }
+        return known?.alias?.takeIf { it.isNotBlank() }
+    }
+
+    /**
      * 특정 기기의 연결 성공 기록 갱신/추가
      */
     fun recordConnectionSuccess(
