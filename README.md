@@ -53,7 +53,7 @@
 
 You can download the pre-compiled APK directly from the [GitHub Releases](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest) page:
 
-- 📦 **Latest APK**: [LYWSD02_BLE_Tool_v1.1.1.apk](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.1.1.apk)
+- 📦 **Latest APK**: [LYWSD02_BLE_Tool_v1.2.1.apk](https://github.com/muro-dot/LYWSD02_BLE_Tool/releases/latest/download/LYWSD02_BLE_Tool_v1.2.1.apk)
 - Requires Android 7.0 (API 24) or higher.
 
 ---
