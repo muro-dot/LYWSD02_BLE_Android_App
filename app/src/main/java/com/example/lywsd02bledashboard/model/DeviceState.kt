@@ -96,7 +96,8 @@ data class ScannedDeviceInfo(
     val address: String,
     val name: String,
     val rssi: Int,
-    val alias: String? = null
+    val alias: String? = null,
+    val isKnownDevice: Boolean = false
 ) {
     /**
      * UI에 표시할 이름 (사용자가 변경한 별칭이 있으면 별칭 우선 노출)
@@ -105,9 +106,10 @@ data class ScannedDeviceInfo(
         get() = if (!alias.isNullOrBlank()) alias else name
 
     /**
-     * 기기명이 'LYWSD02'를 포함하는지 여부 (최상단 정렬 및 UI 강조에 사용)
-     * 원래 이름 또는 설정한 별칭 중 하나라도 LYWSD02를 포함하거나 센서 모델인 경우 true
+     * 기기명이 'LYWSD02'를 포함하거나, 이전에 연결한 적이 있는 등록 기기인지 여부 (최상단 정렬 및 UI 강조에 사용)
      */
     val isLywsd02: Boolean
-        get() = name.contains("LYWSD02", ignoreCase = true) || (alias?.contains("LYWSD02", ignoreCase = true) == true)
+        get() = name.contains("LYWSD02", ignoreCase = true) ||
+                (alias?.contains("LYWSD02", ignoreCase = true) == true) ||
+                isKnownDevice
 }

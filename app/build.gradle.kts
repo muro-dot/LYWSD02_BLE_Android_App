@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.lywsd02bledashboard"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.2.1"
     }
 
     buildTypes {
@@ -99,8 +99,18 @@ if (localPropsFile.exists()) {
 val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
 
 if (!deployDir.isNullOrBlank()) {
+    val currentVersion = "1.2.1"
+
     val copyDebugApkToDeployDir = tasks.register<Copy>("copyDebugApkToDeployDir") {
         val apkFolder = layout.buildDirectory.dir("outputs/apk/debug")
+        from(apkFolder) {
+            include("app-debug.apk")
+            rename("app-debug.apk", "LYWSD02_BLE_Tool_v${currentVersion}.apk")
+        }
+        from(apkFolder) {
+            include("app-debug.apk")
+            rename("app-debug.apk", "LYWSD02_BLE_Tool.apk")
+        }
         from(apkFolder) {
             include("app-debug.apk")
         }
@@ -115,7 +125,7 @@ if (!deployDir.isNullOrBlank()) {
         }
         from(apkFolder) {
             include("app-release.apk")
-            rename("app-release.apk", "LYWSD02_BLE_Tool_v1.2.0.apk")
+            rename("app-release.apk", "LYWSD02_BLE_Tool_v${currentVersion}.apk")
         }
         from(apkFolder) {
             include("app-release.apk")

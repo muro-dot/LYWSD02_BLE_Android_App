@@ -44,7 +44,8 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
     val bleManager = BleManager(
         context = application,
         bluetoothAdapter = bluetoothManager?.adapter,
-        aliasProvider = { repository.getDeviceAlias(it) }
+        aliasProvider = { repository.getDeviceAlias(it) },
+        knownDeviceProvider = { addr -> repository.getKnownDevices().find { it.id.equals(addr, ignoreCase = true) } }
     )
 
     private val _uiState = MutableStateFlow(

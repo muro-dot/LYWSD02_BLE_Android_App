@@ -42,6 +42,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 
+import com.example.lywsd02bledashboard.model.KnownDevice
+
 /**
  * Xiaomi Mijia LYWSD02 센서 전용 BLE 통신 관리자.
  * GATT 연결 수명 주기, 특성 읽기/쓰기 큐, 실시간 데이터 스트리밍, 히스토리 수집 및 재연결을 담당합니다.
@@ -49,7 +51,8 @@ import java.util.UUID
 class BleManager(
     private val context: Context,
     private val bluetoothAdapter: BluetoothAdapter?,
-    private val aliasProvider: ((String) -> String?)? = null
+    private val aliasProvider: ((String) -> String?)? = null,
+    private val knownDeviceProvider: ((String) -> KnownDevice?)? = null
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + Job())
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -136,21 +139,25 @@ class BleManager(
         val device = result?.device ?: return
         val address = device.address
 
-        // 기기명 확인: 1) BluetoothDevice.name -> 2) ScanRecord.deviceName -> 3) 이전 캐시된 이름 -> 4) 대체 문자열
+        val known = knownDeviceProvider?.invoke(address)
+
+        // 기기명 확인: 1) BluetoothDevice.name -> 2) ScanRecord.deviceName -> 3) 등록된 기기 원본 이름 -> 4) 이전 캐시된 이름 -> 5) 대체 문자열
         val discoveredName = device.name?.takeIf { it.isNotBlank() }
             ?: result.scanRecord?.deviceName?.takeIf { it.isNotBlank() }
+            ?: known?.name?.takeIf { it.isNotBlank() }
 
         val existing = scannedDevicesMap[address]
         val finalName = discoveredName
             ?: existing?.name?.takeIf { it != "(알 수 없는 기기)" && it.isNotBlank() }
             ?: "(알 수 없는 기기)"
 
-        val savedAlias = aliasProvider?.invoke(address)
+        val savedAlias = aliasProvider?.invoke(address) ?: known?.alias?.takeIf { it.isNotBlank() }
         val info = ScannedDeviceInfo(
             address = address,
             name = finalName,
             rssi = result.rssi,
-            alias = savedAlias
+            alias = savedAlias,
+            isKnownDevice = (known != null)
         )
 
         scannedDevicesMap[address] = info
