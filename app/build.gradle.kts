@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.lywsd02bledashboard"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.2.2"
+        versionCode = 7
+        versionName = "1.2.3"
     }
 
     buildTypes {
@@ -99,10 +99,18 @@ if (localPropsFile.exists()) {
 val deployDir = localProps.getProperty("apk.deploy.dir") ?: System.getenv("APK_DEPLOY_DIR")
 
 if (!deployDir.isNullOrBlank()) {
-    val currentVersion = "1.2.2"
+    val currentVersion = "1.2.3"
 
     val copyDebugApkToDeployDir = tasks.register<Copy>("copyDebugApkToDeployDir") {
         val apkFolder = layout.buildDirectory.dir("outputs/apk/debug")
+        from(apkFolder) {
+            include("app-debug.apk")
+            rename("app-debug.apk", "lywsd02-ble-android-app-v${currentVersion}.apk")
+        }
+        from(apkFolder) {
+            include("app-debug.apk")
+            rename("app-debug.apk", "lywsd02-ble-android-app.apk")
+        }
         from(apkFolder) {
             include("app-debug.apk")
             rename("app-debug.apk", "LYWSD02_BLE_Android_App_v${currentVersion}.apk")
@@ -127,6 +135,14 @@ if (!deployDir.isNullOrBlank()) {
 
     val copyReleaseApkToDeployDir = tasks.register<Copy>("copyReleaseApkToDeployDir") {
         val apkFolder = layout.buildDirectory.dir("outputs/apk/release")
+        from(apkFolder) {
+            include("app-release.apk")
+            rename("app-release.apk", "lywsd02-ble-android-app.apk")
+        }
+        from(apkFolder) {
+            include("app-release.apk")
+            rename("app-release.apk", "lywsd02-ble-android-app-v${currentVersion}.apk")
+        }
         from(apkFolder) {
             include("app-release.apk")
             rename("app-release.apk", "LYWSD02_BLE_Android_App.apk")
