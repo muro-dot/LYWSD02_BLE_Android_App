@@ -8,7 +8,7 @@ package com.example.lywsd02bledashboard.model
  * @param releaseTitle 릴리즈 제목
  * @param releaseNotes 릴리즈 변경 내역 내용 (마크다운/텍스트)
  * @param apkDownloadUrl APK 파일 직접 다운로드 URL
- * @param apkFileName 다운로드할 파일명 (예: "LYWSD02_BLE_Tool_v1.2.0.apk")
+ * @param apkFileName 다운로드할 파일명 (예: "LYWSD02_BLE_Android_App_v1.2.2.apk")
  * @param hasUpdate 새 버전 존재 여부
  */
 data class AppUpdateInfo(

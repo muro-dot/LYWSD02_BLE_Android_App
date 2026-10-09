@@ -8,7 +8,7 @@
    - 예: `1.2.0` ➔ `1.2.1` ➔ `1.2.2`
 
 2. **APK 배포 경로 자동 복사 규칙**:
-   - 빌드가 완료되면 생성된 APK(`LYWSD02_BLE_Tool_v1.x.y.apk` 및 `LYWSD02_BLE_Tool.apk`)를 네트워크 공유 배포 경로인 `\\192.168.0.250\web\LYWSD02`에 반드시 복사할 것.
+   - 빌드가 완료되면 생성된 APK(`LYWSD02_BLE_Android_App_v1.x.y.apk`, `LYWSD02_BLE_Android_App.apk` 및 `LYWSD02_BLE_Tool.apk`)를 네트워크 공유 배포 경로인 `\\192.168.0.250\web\LYWSD02`에 반드시 복사할 것.
    - `local.properties`의 `apk.deploy.dir=\\\\192.168.0.250\\web\\LYWSD02` 설정을 통해 Gradle 태스크(`copyDebugApkToDeployDir` 및 `copyReleaseApkToDeployDir`)가 빌드 시 자동으로 복사를 수행하도록 보장할 것.
 
 3. **빌드 검증 및 자가 루프 규칙**:
@@ -18,4 +18,4 @@
 
 4. **완료 후 작업**:
    - 최종 빌드 완료 및 멘트 종료 후 윈도우 딩동 멜로디 1회 재생 (`powershell -c "(New-Object Media.SoundPlayer 'C:\Windows\Media\chimes.wav').PlaySync()"`)
-   - 연결된 GitHub 원격 저장소(`https://github.com/muro-dot/LYWSD02_BLE_Tool.git`)로 git commit & push 수행.
+   - 연결된 GitHub 원격 저장소(`https://github.com/muro-dot/LYWSD02_BLE_Android_App.git`)로 git commit & push 수행.

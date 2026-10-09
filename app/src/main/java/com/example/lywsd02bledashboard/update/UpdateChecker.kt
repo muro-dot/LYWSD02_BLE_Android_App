@@ -19,7 +19,7 @@ import java.net.URL
 object UpdateChecker {
 
     private const val GITHUB_OWNER = "muro-dot"
-    private const val GITHUB_REPO = "LYWSD02_BLE_Tool"
+    private const val GITHUB_REPO = "LYWSD02_BLE_Android_App"
     private const val LATEST_RELEASE_API_URL = "https://api.github.com/repos/$GITHUB_OWNER/$GITHUB_REPO/releases/latest"
 
     /**
@@ -77,7 +77,7 @@ object UpdateChecker {
                 releaseTitle = releaseTitle,
                 releaseNotes = releaseNotes,
                 apkDownloadUrl = apkUrl,
-                apkFileName = apkFileName.ifEmpty { "LYWSD02_BLE_Tool_v$latestVersion.apk" },
+                apkFileName = apkFileName.ifEmpty { "LYWSD02_BLE_Android_App_v$latestVersion.apk" },
                 hasUpdate = hasUpdate
             )
         } catch (e: Exception) {
