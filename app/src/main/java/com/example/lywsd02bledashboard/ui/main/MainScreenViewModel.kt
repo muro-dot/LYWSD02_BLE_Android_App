@@ -569,6 +569,14 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
                         messageEn = "You are using the latest version (v${updateInfo.currentVersion}).",
                         type = LogType.SUCCESS
                     )
+                    if (isManual) {
+                        _uiState.update {
+                            it.copy(
+                                appUpdateInfo = updateInfo,
+                                isReinstallDialogOpen = true
+                            )
+                        }
+                    }
                 }
             } else {
                 if (isManual) {
@@ -673,6 +681,20 @@ class MainScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     fun dismissUpdateDialog() {
         _uiState.update { it.copy(isUpdateDialogOpen = false) }
+    }
+
+    fun dismissReinstallDialog() {
+        _uiState.update { it.copy(isReinstallDialogOpen = false) }
+    }
+
+    fun confirmReinstall() {
+        _uiState.update {
+            it.copy(
+                isReinstallDialogOpen = false,
+                isUpdateDialogOpen = true,
+                updateDownloadState = UpdateDownloadState.Idle
+            )
+        }
     }
 
     private fun addLog(messageKo: String, messageEn: String = messageKo, type: LogType) {

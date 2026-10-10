@@ -75,9 +75,9 @@
     <string name="drift_slow">%1$ds slow</string>
     <string name="drift_none">No drift info</string>
 
-    <!-- Settings (Display & Language) Card -->
-    <string name="settings_card_title">Display &amp; Language Settings</string>
-    <string name="settings_card_subtitle">Sensor display unit and app language</string>
+    <!-- Settings (Display) Card -->
+    <string name="settings_card_title">Display Settings</string>
+    <string name="settings_card_subtitle">Sensor display unit configuration</string>
     <string name="settings_temp_unit_title">Sensor Display Unit</string>
     <string name="settings_temp_unit_subtitle">Change temperature unit on sensor LCD</string>
     <string name="settings_unit_celsius">Celsius (°C)</string>
@@ -89,6 +89,11 @@
     <string name="settings_lang_system">Follow System</string>
     <string name="settings_lang_korean">한국어</string>
     <string name="settings_lang_english">English</string>
+
+    <!-- Reinstall Dialog -->
+    <string name="reinstall_dialog_title">Latest Version Installed</string>
+    <string name="reinstall_dialog_message">You are already using the latest version (v%1$s).\n\nWould you like to download and reinstall the current version?</string>
+    <string name="reinstall_dialog_btn_reinstall">Reinstall</string>
 
     <!-- History Card -->
     <string name="history_card_title">History Records</string>

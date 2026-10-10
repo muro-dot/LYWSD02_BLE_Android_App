@@ -57,6 +57,7 @@ import com.example.lywsd02bledashboard.ui.components.HistoryCard
 import com.example.lywsd02bledashboard.ui.components.KnownDevicesCard
 import com.example.lywsd02bledashboard.ui.components.LogConsoleCard
 import com.example.lywsd02bledashboard.ui.components.PermissionHandler
+import com.example.lywsd02bledashboard.ui.components.ReinstallDialog
 import com.example.lywsd02bledashboard.ui.components.SensorMetricsGrid
 import com.example.lywsd02bledashboard.ui.components.UpdateDialog
 
@@ -137,17 +138,12 @@ fun MainScreen(
                 onAutoSyncChange = { viewModel.setAutoSyncClockEnabled(it) }
             )
 
-            // 4. 액정 표시 온도 단위 및 앱 언어 수동 전환 설정 카드
+            // 4. 센서 액정 표시 온도 단위 설정 카드
             DisplaySettingsCard(
                 currentUnit = state.selectedUnit,
                 isUpdating = state.isUpdatingUnit,
                 isConnected = state.connectionState == ConnectionState.CONNECTED,
-                onSaveUnit = { viewModel.saveUnit(it) },
-                currentLanguage = state.appLanguage,
-                onLanguageChange = { newLang ->
-                    viewModel.setAppLanguage(newLang)
-                    (context as? Activity)?.recreate()
-                }
+                onSaveUnit = { viewModel.saveUnit(it) }
             )
 
             // 5. 과거 온습도 기록(최대 96개) 조회 및 CSV 내보내기 카드
@@ -376,6 +372,15 @@ fun MainScreen(
             onDismiss = { viewModel.dismissUpdateDialog() },
             onStartDownload = { viewModel.startAppUpdate() },
             onInstall = { viewModel.installAppUpdate() }
+        )
+    }
+
+    // 최신 버전 사용 중일 때 재설치 확인 다이얼로그
+    if (state.isReinstallDialogOpen && state.appUpdateInfo != null) {
+        ReinstallDialog(
+            currentVersion = state.appUpdateInfo!!.currentVersion,
+            onDismiss = { viewModel.dismissReinstallDialog() },
+            onConfirmReinstall = { viewModel.confirmReinstall() }
         )
     }
 }
