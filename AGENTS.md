@@ -19,3 +19,8 @@
 4. **완료 후 작업**:
    - 최종 빌드 완료 및 멘트 종료 후 윈도우 딩동 멜로디 1회 재생 (`powershell -c "(New-Object Media.SoundPlayer 'C:\Windows\Media\chimes.wav').PlaySync()"`)
    - 연결된 GitHub 원격 저장소(`https://github.com/muro-dot/lywsd02-ble-android-app.git`)로 git commit & push 수행.
+
+5. **릴리즈 노트 작성 규칙 (Release Notes Rules)**:
+   - 릴리즈 노트는 항상 **간단 명료(Concise & Clear)**하게 작성할 것.
+   - 장황한 배경 설명이나 긴 문단 대신, 핵심 변경 사항(Features / Bug Fixes / Improvements)을 1~3줄 이내의 간결한 불릿 포인트로 작성할 것.
+   - 모든 릴리즈 설명은 영문으로 작성할 것.
