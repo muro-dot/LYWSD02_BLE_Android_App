@@ -49,24 +49,34 @@
     <string name="clock_cd_refresh">시간 새로고침</string>
 
     <!-- Timezones -->
-    <string name="tz_kst_jst">대한민국, 일본 (KST/JST)</string>
-    <string name="tz_cst">중국, 대만, 싱가포르 (CST)</string>
-    <string name="tz_ict">베트남, 태국, 인도네시아 서부 (ICT)</string>
-    <string name="tz_ist">인도, 스리랑카 (IST)</string>
-    <string name="tz_gst">UAE, 두바이 (GST)</string>
-    <string name="tz_msk_ast">사우디, 튀르키예, 모스크바 (MSK/AST)</string>
-    <string name="tz_eet_sast">그리스, 이집트, 남아공 (EET/SAST)</string>
-    <string name="tz_cet">중앙유럽 (CET)</string>
-    <string name="tz_utc_gmt">그리니치, 영국, 포르투갈 (UTC/GMT)</string>
-    <string name="tz_brt_art">브라질, 아르헨티나 (BRT/ART)</string>
-    <string name="tz_est">미국 동부 (EST)</string>
-    <string name="tz_cst_us">미국 중부 (CST)</string>
-    <string name="tz_mst">미국 산악 (MST)</string>
-    <string name="tz_pst">미국 서부 (PST)</string>
-    <string name="tz_akst">알래스카 (AKST)</string>
-    <string name="tz_hst">하와이 (HST)</string>
-    <string name="tz_aest">호주 동부, 괌 (AEST/ChST)</string>
-    <string name="tz_nzst">뉴질랜드 (NZST)</string>
+    <string name="tz_utc_minus_12">에니웨톡, 베이커섬 (UTC-12)</string>
+    <string name="tz_utc_minus_11">미드웨이, 아메리칸사모아 (SST, UTC-11)</string>
+    <string name="tz_hst">하와이, 호놀룰루 (HST, UTC-10)</string>
+    <string name="tz_akst">알래스카, 앵커리지 (AKST, UTC-9)</string>
+    <string name="tz_pst">미국 서부, LA, 샌프란시스코 (PST, UTC-8)</string>
+    <string name="tz_mst">미국 산악, 덴버 (MST, UTC-7)</string>
+    <string name="tz_cst_us">미국 중부, 시카고, 댈러스 (CST, UTC-6)</string>
+    <string name="tz_est">미국 동부, 뉴욕, 토론토 (EST, UTC-5)</string>
+    <string name="tz_ast_clt">대서양, 칠레 산티아고 (AST/CLT, UTC-4)</string>
+    <string name="tz_brt_art">브라질, 아르헨티나, 부에노스아이레스 (BRT/ART, UTC-3)</string>
+    <string name="tz_utc_minus_2">사우스조지아, 페르난두지노로냐 (UTC-2)</string>
+    <string name="tz_azot_cvt">아조레스, 카보베르데 (AZOT/CVT, UTC-1)</string>
+    <string name="tz_utc_gmt">그리니치, 영국 런던, 포르투갈 (UTC/GMT)</string>
+    <string name="tz_cet">중앙유럽, 파리, 베를린, 로마 (CET, UTC+1)</string>
+    <string name="tz_eet_sast">그리스, 이집트, 남아공, 카이로 (EET/SAST, UTC+2)</string>
+    <string name="tz_msk_ast">사우디, 튀르키예, 모스크바 (MSK/AST, UTC+3)</string>
+    <string name="tz_gst">UAE 두바이, 아제르바이잔 (GST, UTC+4)</string>
+    <string name="tz_pkt_uzt">파키스탄, 우즈베키스탄 (PKT/UZT, UTC+5)</string>
+    <string name="tz_ist">인도, 스리랑카 (IST, UTC+5:30)</string>
+    <string name="tz_bst">방글라데시, 알마티 (BST, UTC+6)</string>
+    <string name="tz_ict">베트남, 태국, 인도네시아 서부 (ICT, UTC+7)</string>
+    <string name="tz_cst">중국, 대만, 싱가포르, 홍콩 (CST, UTC+8)</string>
+    <string name="tz_kst_jst">대한민국, 일본, 도쿄 (KST/JST, UTC+9)</string>
+    <string name="tz_aest">호주 동부, 시드니, 괌 (AEST/ChST, UTC+10)</string>
+    <string name="tz_sbt">솔로몬 제도, 바누아투 (SBT, UTC+11)</string>
+    <string name="tz_nzst">뉴질랜드, 피지, 오클랜드 (NZST/FJT, UTC+12)</string>
+    <string name="tz_tot">통가, 피닉스 제도 (TOT, UTC+13)</string>
+    <string name="tz_lint">키리바시 라인 제도 (LINT, UTC+14)</string>
     <string name="tz_offset_minutes">오프셋 %1$d 분</string>
 
     <!-- Clock Drift Formatting -->

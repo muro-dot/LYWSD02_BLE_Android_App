@@ -75,9 +75,14 @@ object BleProtocolParser {
     )
 
     /**
-     * 가장 가까운 표준 타임존 오프셋(분) 찾기
+     * 가장 가까운 표준 타임존 오프셋(분) 찾기.
+     * 정수 시간대(60의 배수)와 15분 이내 차이라면 기기 드리프트로 인한 분 단위 왜곡을 방지하기 위해 정수 시간대를 최우선 매칭합니다.
      */
     fun nearestTimezoneOffset(minutes: Int): Int {
+        val nearestMultipleOf60 = Math.round(minutes / 60.0).toInt() * 60
+        if (Math.abs(minutes - nearestMultipleOf60) <= 15 && BleConstants.TIMEZONE_OFFSETS.contains(nearestMultipleOf60)) {
+            return nearestMultipleOf60
+        }
         return BleConstants.TIMEZONE_OFFSETS.minByOrNull { Math.abs(it - minutes) } ?: 0
     }
 
@@ -120,10 +125,10 @@ object BleProtocolParser {
         // 드리프트(오차 초): 기기 시간 - 현재 스마트폰 시간(목표 타임존 반영)
         val drift = localEpoch - nowEpoch - (desiredOffsetMinutes * 60L)
 
-        // 기기 실제 타임존 추론 (30분/45분 단위 타임존 및 정수 시간 지원)
+        // 기기 실제 타임존 추론 (정수 시간대 우선 및 대표 타임존 지원)
         val approximateOffset = Math.round((localEpoch - nowEpoch) / 60.0).toInt()
         val inferredOffset = nearestTimezoneOffset(approximateOffset)
-        val deviceTimezoneMinutes = if (Math.abs(approximateOffset - inferredOffset) <= 5) {
+        val deviceTimezoneMinutes = if (Math.abs(approximateOffset - inferredOffset) <= 15) {
             inferredOffset
         } else {
             timezoneHours * 60

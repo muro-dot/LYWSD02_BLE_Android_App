@@ -49,24 +49,34 @@
     <string name="clock_cd_refresh">Refresh Time</string>
 
     <!-- Timezones -->
-    <string name="tz_kst_jst">South Korea, Japan (KST/JST)</string>
-    <string name="tz_cst">China, Taiwan, Singapore (CST)</string>
-    <string name="tz_ict">Vietnam, Thailand, W.Indonesia (ICT)</string>
-    <string name="tz_ist">India, Sri Lanka (IST)</string>
-    <string name="tz_gst">UAE, Dubai (GST)</string>
-    <string name="tz_msk_ast">Saudi, Turkey, Moscow (MSK/AST)</string>
-    <string name="tz_eet_sast">Greece, Egypt, S.Africa (EET/SAST)</string>
-    <string name="tz_cet">Central Europe (CET)</string>
-    <string name="tz_utc_gmt">Greenwich, UK, Portugal (UTC/GMT)</string>
-    <string name="tz_brt_art">Brazil, Argentina (BRT/ART)</string>
-    <string name="tz_est">US Eastern (EST)</string>
-    <string name="tz_cst_us">US Central (CST)</string>
-    <string name="tz_mst">US Mountain (MST)</string>
-    <string name="tz_pst">US Pacific (PST)</string>
-    <string name="tz_akst">Alaska (AKST)</string>
-    <string name="tz_hst">Hawaii (HST)</string>
-    <string name="tz_aest">E.Australia, Guam (AEST/ChST)</string>
-    <string name="tz_nzst">New Zealand (NZST)</string>
+    <string name="tz_utc_minus_12">Eniwetok, Baker Is. (UTC-12)</string>
+    <string name="tz_utc_minus_11">Midway, American Samoa (SST, UTC-11)</string>
+    <string name="tz_hst">Hawaii, Honolulu (HST, UTC-10)</string>
+    <string name="tz_akst">Alaska, Anchorage (AKST, UTC-9)</string>
+    <string name="tz_pst">US Pacific, LA, San Francisco (PST, UTC-8)</string>
+    <string name="tz_mst">US Mountain, Denver (MST, UTC-7)</string>
+    <string name="tz_cst_us">US Central, Chicago, Dallas (CST, UTC-6)</string>
+    <string name="tz_est">US Eastern, New York, Toronto (EST, UTC-5)</string>
+    <string name="tz_ast_clt">Atlantic, Santiago, Chile (AST/CLT, UTC-4)</string>
+    <string name="tz_brt_art">Brazil, Argentina, Buenos Aires (BRT/ART, UTC-3)</string>
+    <string name="tz_utc_minus_2">South Georgia, Mid-Atlantic (UTC-2)</string>
+    <string name="tz_azot_cvt">Azores, Cape Verde (AZOT/CVT, UTC-1)</string>
+    <string name="tz_utc_gmt">Greenwich, London, Portugal (UTC/GMT)</string>
+    <string name="tz_cet">Central Europe, Paris, Berlin, Rome (CET, UTC+1)</string>
+    <string name="tz_eet_sast">Greece, Egypt, S.Africa, Cairo (EET/SAST, UTC+2)</string>
+    <string name="tz_msk_ast">Saudi, Turkey, Moscow (MSK/AST, UTC+3)</string>
+    <string name="tz_gst">UAE, Dubai, Baku (GST, UTC+4)</string>
+    <string name="tz_pkt_uzt">Pakistan, Uzbekistan (PKT/UZT, UTC+5)</string>
+    <string name="tz_ist">India, Sri Lanka (IST, UTC+5:30)</string>
+    <string name="tz_bst">Bangladesh, Almaty (BST, UTC+6)</string>
+    <string name="tz_ict">Vietnam, Thailand, W.Indonesia (ICT, UTC+7)</string>
+    <string name="tz_cst">China, Taiwan, Singapore, Hong Kong (CST, UTC+8)</string>
+    <string name="tz_kst_jst">South Korea, Japan, Tokyo (KST/JST, UTC+9)</string>
+    <string name="tz_aest">E.Australia, Sydney, Guam (AEST/ChST, UTC+10)</string>
+    <string name="tz_sbt">Solomon Is., Vanuatu (SBT, UTC+11)</string>
+    <string name="tz_nzst">New Zealand, Fiji, Auckland (NZST/FJT, UTC+12)</string>
+    <string name="tz_tot">Tonga, Phoenix Is. (TOT, UTC+13)</string>
+    <string name="tz_lint">Line Is., Kiribati (LINT, UTC+14)</string>
     <string name="tz_offset_minutes">Offset %1$d min</string>
 
     <!-- Clock Drift Formatting -->

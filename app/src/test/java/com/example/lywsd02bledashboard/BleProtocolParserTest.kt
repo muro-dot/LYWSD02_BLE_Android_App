@@ -156,6 +156,8 @@ class BleProtocolParserTest {
     fun testNearestTimezoneOffset() {
         assertEquals(540, BleProtocolParser.nearestTimezoneOffset(540))
         assertEquals(540, BleProtocolParser.nearestTimezoneOffset(538)) // 2분 오차는 540에 매칭
+        assertEquals(540, BleProtocolParser.nearestTimezoneOffset(530)) // 10분 드리프트도 정수 540에 우선 매칭
+        assertEquals(540, BleProtocolParser.nearestTimezoneOffset(549)) // 9분 드리프트도 정수 540에 우선 매칭
         assertEquals(330, BleProtocolParser.nearestTimezoneOffset(330)) // 인도 5시간 30분
         assertEquals(-300, BleProtocolParser.nearestTimezoneOffset(-300))
         assertEquals(0, BleProtocolParser.nearestTimezoneOffset(0))
