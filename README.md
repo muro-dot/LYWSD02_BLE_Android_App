@@ -14,7 +14,7 @@
 <img width="360" alt="LYWSD02" src="https://github.com/user-attachments/assets/fbd66c98-02ff-4f2d-ad43-b1087f127c95" />
 </p>
 <p align="center">
-  <img src="img/Screenshot_20261005_171937_LYWSD02 BLE Dashboard.jpg" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
+  <img src="img/Screenshot_20261010_LYWSD02_BLE_Tool.jpg" alt="LYWSD02 BLE Tool Android App Screenshot" width="320">
 </p>
 
 ---
