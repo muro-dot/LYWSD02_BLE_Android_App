@@ -60,14 +60,14 @@ fun KnownDevicesCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(32.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(TealPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
@@ -76,14 +76,14 @@ fun KnownDevicesCard(
                         imageVector = Icons.Default.Devices,
                         contentDescription = null,
                         tint = TealPrimary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
                         text = stringResource(R.string.known_devices_title, knownDevices.size),
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary
                     )
@@ -95,7 +95,7 @@ fun KnownDevicesCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Column(
                 modifier = Modifier
@@ -110,7 +110,7 @@ fun KnownDevicesCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onDeviceClick(device) }
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -118,7 +118,7 @@ fun KnownDevicesCard(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = device.displayName(),
-                                    fontSize = 14.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isCurrent) TealPrimary else InkPrimary
                                 )
@@ -126,7 +126,7 @@ fun KnownDevicesCard(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = stringResource(R.string.known_devices_connected_tag),
-                                        fontSize = 11.sp,
+                                        fontSize = 10.sp,
                                         color = TealPrimary,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -143,13 +143,13 @@ fun KnownDevicesCard(
 
                         IconButton(
                             onClick = { onDeleteDevice(device.id) },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(28.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.known_devices_cd_delete),
                                 tint = StatusRed.copy(alpha = 0.7f),
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     }

@@ -68,7 +68,7 @@ fun DeviceIdentityCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -82,7 +82,7 @@ fun DeviceIdentityCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(if (isConnected) SurfaceSoft else Color(0xFFF0F0F0)),
                         contentAlignment = Alignment.Center
@@ -91,10 +91,10 @@ fun DeviceIdentityCard(
                             imageVector = Icons.Default.Sensors,
                             contentDescription = null,
                             tint = if (isConnected) TealPrimary else InkPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         val displayTitle = when {
                             !deviceAlias.isNullOrBlank() -> deviceAlias
@@ -103,7 +103,7 @@ fun DeviceIdentityCard(
                         }
                         Text(
                             text = displayTitle,
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary,
                             maxLines = 1,
@@ -140,21 +140,21 @@ fun DeviceIdentityCard(
                         contentColor = TealPrimary,
                         disabledContentColor = InkPrimary
                     ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                     modifier = Modifier
-                        .height(36.dp)
-                        .defaultMinSize(minWidth = 84.dp)
+                        .height(32.dp)
+                        .defaultMinSize(minWidth = 76.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.device_cd_rename),
-                        modifier = Modifier.size(13.dp),
+                        modifier = Modifier.size(12.dp),
                         tint = if (isConnected) TealPrimary else InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.device_btn_rename),
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isConnected) TealPrimary else InkPrimary,
                         maxLines = 1,
@@ -165,13 +165,13 @@ fun DeviceIdentityCard(
 
             // MAC 주소 복사 행
             if (deviceId != null) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(6.dp))
                         .background(SurfaceSoft)
-                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

@@ -1,6 +1,7 @@
 package com.example.lywsd02bledashboard.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,7 +70,7 @@ fun DisplaySettingsCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             // 카드 상단 헤더
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -77,7 +78,7 @@ fun DisplaySettingsCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(32.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(CyanAccent.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
@@ -86,104 +87,118 @@ fun DisplaySettingsCard(
                         imageVector = Icons.Default.Tune,
                         contentDescription = null,
                         tint = CyanAccent,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
                         text = stringResource(R.string.settings_card_title),
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary
                     )
                     Text(
                         text = stringResource(R.string.settings_card_subtitle),
-                        fontSize = 11.sp,
+                        fontSize = 10.5.sp,
                         color = InkMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // 1. 센서 액정 온도 단위 설정 섹션
+            // 1. 센서 액정 온도 단위 설정 (세그먼트 토글 버튼으로 찌그러짐 원천 방지)
             Text(
                 text = stringResource(R.string.settings_temp_unit_title),
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = InkPrimary
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = selectedUnit == TemperatureUnit.CELSIUS,
-                        onClick = { selectedUnit = TemperatureUnit.CELSIUS },
-                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                    )
+                // 섭씨 (°C) 선택 버튼
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { onSaveUnit(TemperatureUnit.CELSIUS) },
+                    enabled = isConnected && !isUpdating,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = if (currentUnit == TemperatureUnit.CELSIUS) {
+                        ButtonDefaults.outlinedButtonColors(
+                            containerColor = TealPrimary.copy(alpha = 0.12f),
+                            contentColor = TealPrimary
+                        )
+                    } else {
+                        ButtonDefaults.outlinedButtonColors(
+                            contentColor = InkPrimary
+                        )
+                    },
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (currentUnit == TemperatureUnit.CELSIUS) TealPrimary else BorderLine
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    if (isUpdating && currentUnit != TemperatureUnit.CELSIUS) {
+                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = TealPrimary)
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
                     Text(
                         text = stringResource(R.string.settings_unit_celsius),
-                        fontSize = 13.sp,
-                        color = InkPrimary
-                    )
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    RadioButton(
-                        selected = selectedUnit == TemperatureUnit.FAHRENHEIT,
-                        onClick = { selectedUnit = TemperatureUnit.FAHRENHEIT },
-                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                    )
-                    Text(
-                        text = stringResource(R.string.settings_unit_fahrenheit),
-                        fontSize = 13.sp,
-                        color = InkPrimary
+                        fontSize = 11.5.sp,
+                        fontWeight = if (currentUnit == TemperatureUnit.CELSIUS) FontWeight.Bold else FontWeight.Medium,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
 
-                Button(
-                    onClick = { onSaveUnit(selectedUnit) },
+                // 화씨 (°F) 선택 버튼
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { onSaveUnit(TemperatureUnit.FAHRENHEIT) },
                     enabled = isConnected && !isUpdating,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = TealPrimary,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    if (isUpdating) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.settings_btn_saving),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            softWrap = false
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = if (currentUnit == TemperatureUnit.FAHRENHEIT) {
+                        ButtonDefaults.outlinedButtonColors(
+                            containerColor = TealPrimary.copy(alpha = 0.12f),
+                            contentColor = TealPrimary
                         )
                     } else {
-                        Text(
-                            text = stringResource(R.string.settings_btn_save_unit),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            softWrap = false
+                        ButtonDefaults.outlinedButtonColors(
+                            contentColor = InkPrimary
                         )
+                    },
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (currentUnit == TemperatureUnit.FAHRENHEIT) TealPrimary else BorderLine
+                    ),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    if (isUpdating && currentUnit != TemperatureUnit.FAHRENHEIT) {
+                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = TealPrimary)
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
+                    Text(
+                        text = stringResource(R.string.settings_unit_fahrenheit),
+                        fontSize = 11.5.sp,
+                        fontWeight = if (currentUnit == TemperatureUnit.FAHRENHEIT) FontWeight.Bold else FontWeight.Medium,
+                        maxLines = 1,
+                        softWrap = false
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-            HorizontalDivider(color = BorderLine.copy(alpha = 0.7f), thickness = 1.dp)
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = BorderLine.copy(alpha = 0.7f), thickness = 0.5.dp)
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 2. 앱 표시 언어 수동 전환 섹션
             Row(
@@ -194,70 +209,93 @@ fun DisplaySettingsCard(
                     imageVector = Icons.Default.Language,
                     contentDescription = null,
                     tint = TealPrimary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Column {
                     Text(
                         text = stringResource(R.string.settings_language_title),
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = InkPrimary
                     )
                     Text(
                         text = stringResource(R.string.settings_language_subtitle),
-                        fontSize = 11.sp,
+                        fontSize = 10.5.sp,
                         color = InkMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 시스템 기본 (Follow System)
-                RadioButton(
-                    selected = currentLanguage == "system",
-                    onClick = { onLanguageChange("system") },
-                    colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                )
-                Text(
-                    text = stringResource(R.string.settings_lang_system),
-                    fontSize = 12.sp,
-                    color = InkPrimary
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onLanguageChange("system") }
+                ) {
+                    RadioButton(
+                        selected = currentLanguage == "system",
+                        onClick = { onLanguageChange("system") },
+                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = stringResource(R.string.settings_lang_system),
+                        fontSize = 11.5.sp,
+                        color = InkPrimary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
 
                 // 한국어
-                RadioButton(
-                    selected = currentLanguage == "ko",
-                    onClick = { onLanguageChange("ko") },
-                    colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                )
-                Text(
-                    text = stringResource(R.string.settings_lang_korean),
-                    fontSize = 12.sp,
-                    color = InkPrimary
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onLanguageChange("ko") }
+                ) {
+                    RadioButton(
+                        selected = currentLanguage == "ko",
+                        onClick = { onLanguageChange("ko") },
+                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = stringResource(R.string.settings_lang_korean),
+                        fontSize = 11.5.sp,
+                        color = InkPrimary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
 
                 // English
-                RadioButton(
-                    selected = currentLanguage == "en",
-                    onClick = { onLanguageChange("en") },
-                    colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                )
-                Text(
-                    text = stringResource(R.string.settings_lang_english),
-                    fontSize = 12.sp,
-                    color = InkPrimary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onLanguageChange("en") }
+                ) {
+                    RadioButton(
+                        selected = currentLanguage == "en",
+                        onClick = { onLanguageChange("en") },
+                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = stringResource(R.string.settings_lang_english),
+                        fontSize = 11.5.sp,
+                        color = InkPrimary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
             }
         }
     }

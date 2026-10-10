@@ -78,7 +78,7 @@ fun LogConsoleCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -92,7 +92,7 @@ fun LogConsoleCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(TealPrimary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
@@ -101,14 +101,14 @@ fun LogConsoleCard(
                             imageVector = Icons.Default.Terminal,
                             contentDescription = null,
                             tint = TealPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.log_card_title),
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary,
                             maxLines = 1,
@@ -132,21 +132,21 @@ fun LogConsoleCard(
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = InkPrimary
                     ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                     modifier = Modifier
-                        .height(36.dp)
-                        .defaultMinSize(minWidth = 75.dp)
+                        .height(32.dp)
+                        .defaultMinSize(minWidth = 68.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteSweep,
                         contentDescription = stringResource(R.string.log_cd_clear),
-                        modifier = Modifier.size(14.dp),
+                        modifier = Modifier.size(13.dp),
                         tint = InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.log_btn_clear),
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkPrimary,
                         maxLines = 1,
@@ -155,23 +155,23 @@ fun LogConsoleCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 로그 박스
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp, max = 220.dp)
+                    .heightIn(min = 85.dp, max = 150.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(SurfaceSoft)
                     .border(1.dp, BorderLine, RoundedCornerShape(8.dp))
-                    .padding(12.dp)
+                    .padding(8.dp)
             ) {
                 if (logs.isEmpty()) {
                     Text(
                         text = stringResource(R.string.log_empty),
                         color = InkMuted,
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -191,28 +191,31 @@ fun LogConsoleCard(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 3.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                    .padding(vertical = 1.5.dp),
+                                verticalAlignment = Alignment.Top
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(6.dp)
+                                        .padding(top = 4.dp)
+                                        .size(5.dp)
                                         .clip(CircleShape)
                                         .background(dotColor)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "[${log.formattedTime()}]",
                                     color = InkMuted,
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily.Monospace
+                                    fontSize = 10.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    lineHeight = 14.sp
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = log.getMessage(isKorean),
                                     color = InkPrimary,
-                                    fontSize = 12.sp,
+                                    fontSize = 11.sp,
                                     fontFamily = FontFamily.Monospace,
+                                    lineHeight = 14.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                             }

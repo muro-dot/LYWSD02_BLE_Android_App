@@ -92,8 +92,8 @@ fun MainScreen(
                 .background(BackgroundPaper)
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // 블루투스 권한 핸들러 (Activity Context 정상 보존으로 rememberLauncherForActivityResult 안전 실행)
             PermissionHandler(onPermissionsGranted = {})
@@ -185,7 +185,7 @@ fun MainScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

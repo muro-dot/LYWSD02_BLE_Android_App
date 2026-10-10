@@ -1,6 +1,7 @@
 package com.example.lywsd02bledashboard.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,7 +95,7 @@ fun ClockSettingsCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             // 헤더 및 시계 새로고침 버튼
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -104,7 +105,7 @@ fun ClockSettingsCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(TealPrimary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
@@ -113,20 +114,20 @@ fun ClockSettingsCard(
                             imageVector = Icons.Default.AccessTime,
                             contentDescription = null,
                             tint = TealPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = stringResource(R.string.clock_title),
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary
                         )
                         Text(
                             text = stringResource(R.string.clock_subtitle),
-                            fontSize = 11.sp,
+                            fontSize = 10.5.sp,
                             color = InkMuted
                         )
                     }
@@ -135,17 +136,18 @@ fun ClockSettingsCard(
                 IconButton(
                     onClick = onRefreshClock,
                     enabled = isConnected,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(R.string.clock_cd_refresh),
-                        tint = if (isConnected) TealPrimary else InkMuted
+                        tint = if (isConnected) TealPrimary else InkMuted,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 기기 현재 시계 디스플레이
             Box(
@@ -153,7 +155,7 @@ fun ClockSettingsCard(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
                     .background(SurfaceSoft)
-                    .padding(14.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -163,14 +165,14 @@ fun ClockSettingsCard(
                     Column {
                         Text(
                             text = stringResource(R.string.clock_device_current_time),
-                            fontSize = 11.sp,
+                            fontSize = 10.5.sp,
                             fontWeight = FontWeight.Medium,
                             color = InkMuted
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = deviceTimeFormatted ?: "--:--:--",
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = InkPrimary,
                             fontFamily = FontFamily.Monospace
@@ -186,11 +188,11 @@ fun ClockSettingsCard(
                         }
                         Text(
                             text = stringResource(R.string.clock_sensor_timezone, tzString),
-                            fontSize = 11.sp,
+                            fontSize = 10.5.sp,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimary
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         val isSynced = clockDriftSeconds != null && Math.abs(clockDriftSeconds) <= 1
                         val driftText = when {
                             clockDriftSeconds == null -> stringResource(R.string.drift_none)
@@ -203,12 +205,12 @@ fun ClockSettingsCard(
                                 imageVector = if (isSynced) Icons.Default.CheckCircle else Icons.Default.Warning,
                                 contentDescription = null,
                                 tint = if (isSynced) StatusGreen else StatusAmber,
-                                modifier = Modifier.size(14.dp)
+                                modifier = Modifier.size(13.dp)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = driftText,
-                                fontSize = 11.sp,
+                                fontSize = 10.5.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (isSynced) StatusGreen else StatusAmber
                             )
@@ -217,9 +219,9 @@ fun ClockSettingsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // 타임존 드롭다운
+            // 타임존 드롭다운 (단일 행 고정 및 텍스트 줄바꿈 방지)
             var expandedTimezone by remember { mutableStateOf(false) }
             val tzDesc = getTimezoneDescriptionRes(targetTimezoneMinutes)
 
@@ -237,6 +239,8 @@ fun ClockSettingsCard(
                     value = textFieldValue,
                     onValueChange = {},
                     readOnly = true,
+                    singleLine = true,
+                    maxLines = 1,
                     label = { 
                         Text(
                             text = if (isUsingSystemTimezone) {
@@ -246,7 +250,8 @@ fun ClockSettingsCard(
                             }, 
                             color = InkPrimary, 
                             fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp
+                            fontSize = 11.5.sp,
+                            maxLines = 1
                         ) 
                     },
                     colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
@@ -263,7 +268,7 @@ fun ClockSettingsCard(
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontWeight = FontWeight.SemiBold,
                         color = InkPrimary,
-                        fontSize = 13.sp
+                        fontSize = 12.sp
                     ),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTimezone) },
                     modifier = Modifier
@@ -283,22 +288,22 @@ fun ClockSettingsCard(
                     DropdownMenuItem(
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = "📱", fontSize = 16.sp)
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = "📱", fontSize = 15.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             text = stringResource(R.string.clock_phone_system_timezone),
                                             fontWeight = FontWeight.Bold,
                                             color = TealPrimary,
-                                            fontSize = 13.sp
+                                            fontSize = 12.sp
                                         )
                                         if (isUsingSystemTimezone) {
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
                                                 text = stringResource(R.string.clock_currently_selected),
                                                 color = StatusGreen,
-                                                fontSize = 11.sp,
+                                                fontSize = 10.5.sp,
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         }
@@ -307,7 +312,7 @@ fun ClockSettingsCard(
                                         text = "${BleProtocolParser.formatTimezoneOffset(systemOffset)} ($systemTzDesc)",
                                         color = InkPrimary,
                                         fontWeight = FontWeight.Medium,
-                                        fontSize = 12.sp
+                                        fontSize = 11.5.sp
                                     )
                                 }
                             }
@@ -327,7 +332,8 @@ fun ClockSettingsCard(
                                 Text(
                                     text = "${BleProtocolParser.formatTimezoneOffset(offset)} ($itemDesc)",
                                     color = InkPrimary,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 12.sp
                                 )
                             },
                             onClick = {
@@ -340,17 +346,18 @@ fun ClockSettingsCard(
             }
 
             if (!isUsingSystemTimezone) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
-                        onClick = onSelectSystemTimezone
+                        onClick = onSelectSystemTimezone,
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.clock_revert_to_system_tz),
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimary
                         )
@@ -358,9 +365,9 @@ fun ClockSettingsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // 12시간 / 24시간 표시 모드 라디오
+            // 12시간 / 24시간 표시 모드 라디오 (한 줄 유지 컴팩트 디자인)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -368,41 +375,60 @@ fun ClockSettingsCard(
             ) {
                 Text(
                     text = stringResource(R.string.clock_display_format),
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = InkPrimary
                 )
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = clockMode == ClockDisplayMode.MODE_24H,
-                        onClick = { onClockModeChange(ClockDisplayMode.MODE_24H) },
-                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                    )
-                    Text(
-                        text = stringResource(R.string.clock_format_24h),
-                        fontSize = 13.sp,
-                        color = InkPrimary
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { onClockModeChange(ClockDisplayMode.MODE_24H) }
+                    ) {
+                        RadioButton(
+                            selected = clockMode == ClockDisplayMode.MODE_24H,
+                            onClick = { onClockModeChange(ClockDisplayMode.MODE_24H) },
+                            colors = RadioButtonDefaults.colors(selectedColor = TealPrimary),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = stringResource(R.string.clock_format_24h),
+                            fontSize = 12.sp,
+                            color = InkPrimary,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    RadioButton(
-                        selected = clockMode == ClockDisplayMode.MODE_12H,
-                        onClick = { onClockModeChange(ClockDisplayMode.MODE_12H) },
-                        colors = RadioButtonDefaults.colors(selectedColor = TealPrimary)
-                    )
-                    Text(
-                        text = stringResource(R.string.clock_format_12h),
-                        fontSize = 13.sp,
-                        color = InkPrimary
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { onClockModeChange(ClockDisplayMode.MODE_12H) }
+                    ) {
+                        RadioButton(
+                            selected = clockMode == ClockDisplayMode.MODE_12H,
+                            onClick = { onClockModeChange(ClockDisplayMode.MODE_12H) },
+                            colors = RadioButtonDefaults.colors(selectedColor = TealPrimary),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = stringResource(R.string.clock_format_12h),
+                            fontSize = 12.sp,
+                            color = InkPrimary,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // 자동 동기화 체크박스
+            // 자동 동기화 체크박스 (컴팩트)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -410,17 +436,19 @@ fun ClockSettingsCard(
                 Checkbox(
                     checked = isAutoSyncEnabled,
                     onCheckedChange = onAutoSyncChange,
-                    colors = CheckboxDefaults.colors(checkedColor = TealPrimary)
+                    colors = CheckboxDefaults.colors(checkedColor = TealPrimary),
+                    modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.clock_auto_sync_label),
-                    fontSize = 12.sp,
-                    color = InkPrimary
+                    fontSize = 11.5.sp,
+                    color = InkPrimary,
+                    maxLines = 1
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 시계 동기화 실행 버튼
             Button(
@@ -431,29 +459,33 @@ fun ClockSettingsCard(
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
             ) {
                 if (isSyncing) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                         color = Color.White,
                         strokeWidth = 2.dp
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.clock_btn_syncing),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Default.Sync,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.clock_btn_sync_now),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
                     )
                 }
             }

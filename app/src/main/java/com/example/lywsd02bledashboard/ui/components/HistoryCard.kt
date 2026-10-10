@@ -83,7 +83,7 @@ fun HistoryCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             // 헤더 (좌측 타이틀 + 우측 CSV 내보내기 버튼)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -98,7 +98,7 @@ fun HistoryCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(TealPrimary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
@@ -107,14 +107,14 @@ fun HistoryCard(
                             imageVector = Icons.Default.History,
                             contentDescription = null,
                             tint = TealPrimary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.history_card_title),
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = InkPrimary,
                             maxLines = 1,
@@ -143,21 +143,21 @@ fun HistoryCard(
                         contentColor = TealPrimary,
                         disabledContentColor = InkPrimary
                     ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                     modifier = Modifier
-                        .height(36.dp)
-                        .defaultMinSize(minWidth = 105.dp)
+                        .height(32.dp)
+                        .defaultMinSize(minWidth = 96.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = stringResource(R.string.history_cd_export_csv),
-                        modifier = Modifier.size(13.dp),
+                        modifier = Modifier.size(12.dp),
                         tint = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.history_btn_export_csv),
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (historyRecords.isNotEmpty()) TealPrimary else InkPrimary,
                         maxLines = 1,
@@ -166,7 +166,7 @@ fun HistoryCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 조회 개수 선택 및 불러오기 버튼
             Row(
@@ -190,8 +190,8 @@ fun HistoryCard(
                             Text(
                                 text = stringResource(R.string.history_query_count_label), 
                                 color = InkPrimary, 
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 11.sp
                             ) 
                         },
                         colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
@@ -208,7 +208,7 @@ fun HistoryCard(
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontWeight = FontWeight.SemiBold,
                             color = InkPrimary,
-                            fontSize = 14.sp
+                            fontSize = 13.sp
                         ),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLimit) },
                         modifier = Modifier
@@ -228,7 +228,8 @@ fun HistoryCard(
                                     Text(
                                         text = stringResource(R.string.history_recent_items, lim),
                                         color = InkPrimary,
-                                        fontWeight = FontWeight.Medium
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 13.sp
                                     ) 
                                 },
                                 onClick = {
@@ -251,7 +252,7 @@ fun HistoryCard(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
                         .weight(1.15f)
-                        .height(56.dp)
+                        .height(52.dp)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
@@ -263,6 +264,7 @@ fun HistoryCard(
                         Text(
                             text = stringResource(R.string.history_btn_loading), 
                             fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
                             maxLines = 1,
                             softWrap = false
                         )
@@ -276,7 +278,7 @@ fun HistoryCard(
                         Text(
                             text = stringResource(R.string.history_btn_fetch), 
                             fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             maxLines = 1,
                             softWrap = false
                         )
@@ -285,16 +287,16 @@ fun HistoryCard(
             }
 
             if (!statusMessage.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = statusMessage,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = TealPrimary,
                     fontWeight = FontWeight.Medium
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 기록 테이블 헤더 및 리스트
             if (historyRecords.isEmpty()) {
@@ -303,7 +305,7 @@ fun HistoryCard(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .background(SurfaceSoft)
-                        .padding(24.dp),
+                        .padding(14.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -312,7 +314,7 @@ fun HistoryCard(
                         } else {
                             stringResource(R.string.history_empty_idle)
                         },
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         color = InkMuted
                     )
                 }
@@ -328,7 +330,7 @@ fun HistoryCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0xFFE2EBE8))
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
@@ -358,7 +360,7 @@ fun HistoryCard(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 240.dp)
+                            .heightIn(max = 180.dp)
                     ) {
                         items(historyRecords) { item ->
                             val maxTempDisplay = formatTemperature(item.maxTemperature, unit)
@@ -367,7 +369,7 @@ fun HistoryCard(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                                    .padding(horizontal = 10.dp, vertical = 4.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {

@@ -93,14 +93,14 @@ fun SensorMetricsGrid(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 온도 & 습도 가로 2열 배치
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // 온도 카드
             val displayTemp = if (temperatureC != null) {
@@ -150,7 +150,7 @@ fun SensorMetricsGrid(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 배터리 카드
         val displayBattery = if (battery != null) "$battery %" else "-- %"
@@ -176,7 +176,7 @@ fun SensorMetricsGrid(
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -185,7 +185,7 @@ fun SensorMetricsGrid(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(32.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(batColor.copy(alpha = 0.12f)),
                             contentAlignment = Alignment.Center
@@ -194,20 +194,20 @@ fun SensorMetricsGrid(
                                 imageVector = batIcon,
                                 contentDescription = null,
                                 tint = batColor,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
                                 text = stringResource(R.string.metric_battery_title),
-                                fontSize = 13.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = InkSecondary
                             )
                             Text(
                                 text = batHint,
-                                fontSize = 11.sp,
+                                fontSize = 10.5.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = batColor
                             )
@@ -216,31 +216,31 @@ fun SensorMetricsGrid(
 
                     Text(
                         text = displayBattery,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = InkPrimary,
                         fontFamily = FontFamily.Monospace
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // 배터리 프로그레스 바
                 LinearProgressIndicator(
                     progress = { animatedBattery },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
                     color = batColor,
                     trackColor = SurfaceSoft
                 )
 
                 if (lastBatteryTime != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.metric_last_battery_updated, lastBatteryTime),
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         color = InkSecondary,
                         modifier = Modifier.align(Alignment.End)
                     )
@@ -267,7 +267,7 @@ private fun MetricCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -275,14 +275,14 @@ private fun MetricCard(
             ) {
                 Text(
                     text = title,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = InkSecondary
                 )
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(6.dp))
                         .background(iconTint.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -290,39 +290,39 @@ private fun MetricCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = iconTint,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = value,
-                fontSize = 24.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = InkPrimary,
                 fontFamily = FontFamily.Monospace
             )
 
             if (progress != null) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 LinearProgressIndicator(
                     progress = { progress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
+                        .height(5.dp)
+                        .clip(RoundedCornerShape(2.5.dp)),
                     color = progressColor,
                     trackColor = SurfaceSoft
                 )
             }
 
             if (timestamp != null) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.metric_last_updated, timestamp),
-                    fontSize = 10.sp,
+                    fontSize = 9.5.sp,
                     color = InkMuted,
                     modifier = Modifier.align(Alignment.End)
                 )
