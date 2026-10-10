@@ -168,6 +168,7 @@
     <string name="perm_btn_grant">권한 허용하기</string>
 
     <!-- Footer -->
+    <string name="footer_app_title_version">LYWSD02 BLE Dashboard · v%1$s</string>
     <string name="footer_release_date">출시일자: 2026. 10. 10</string>
     <string name="footer_check_updates">업데이트 확인</string>
 </resources>

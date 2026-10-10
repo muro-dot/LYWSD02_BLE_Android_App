@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lywsd02bledashboard.BuildConfig
 import com.example.lywsd02bledashboard.R
 import com.example.lywsd02bledashboard.model.ConnectionState
 import com.example.lywsd02bledashboard.theme.BackgroundPaper
@@ -177,7 +178,7 @@ fun MainScreen(
                 onClearLogs = { viewModel.clearLogs() }
             )
 
-            // 8. 앱 버전 및 출시일자 푸터 정보 (v1.2.6)
+            // 8. 앱 버전 및 출시일자 푸터 정보 (BuildConfig.VERSION_NAME 동적 연동)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -185,7 +186,7 @@ fun MainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "LYWSD02 BLE Dashboard · v1.2.6",
+                    text = stringResource(R.string.footer_app_title_version, BuildConfig.VERSION_NAME),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = InkMuted
